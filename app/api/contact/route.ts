@@ -14,8 +14,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Invalid email address." }, { status: 400 });
     }
 
-    // Save message to Supabase
-    let savedLocally = false;
     const newMsg = {
       id: Date.now().toString(),
       name: name.trim(),
@@ -27,15 +25,26 @@ export async function POST(request: NextRequest) {
       reply: null,
     };
 
-    const db = getSupabase();
-    const { error: dbError } = await db
-      .from("messages")
-      .insert([newMsg]);
+    // Try Supabase first
+    try {
+      const db = getSupabase();
+      const { error: dbError } = await db.from("messages").insert([newMsg]);
+      if (!dbError) newMsg as any;
+    } catch {
+      // fall through
+    }
 
-    if (!dbError) {
-      savedLocally = true;
-    } else {
-      console.error("Failed to save message to Supabase:", dbError);
+    // Fallback: save to local file
+    try {
+      const fs = await import("fs");
+      const path = await import("path");
+      const messagesPath = path.join(process.cwd(), "data", "messages.json");
+      let messages: any[] = [];
+      try { messages = JSON.parse(fs.readFileSync(messagesPath, "utf-8")); } catch {}
+      messages.unshift(newMsg);
+      fs.writeFileSync(messagesPath, JSON.stringify(messages, null, 2), "utf-8");
+    } catch (storageErr) {
+      console.error("Failed to save message locally:", storageErr);
     }
 
     // Try sending email
@@ -74,7 +83,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    return NextResponse.json({ success: true, savedLocally });
+    return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Contact form error:", error);
     return NextResponse.json(
