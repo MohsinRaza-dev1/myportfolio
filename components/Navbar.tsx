@@ -14,14 +14,31 @@ export default function Navbar() {
   const [activeSection, setActiveSection] = useState("home");
   const [navigating, setNavigating] = useState(""); // section id being navigated to
 
-  // Lock body scroll when mobile menu is open (prevents menu from shifting with page)
+  // Lock body scroll when mobile menu is open — uses position:fixed instead of
+  // overflow:hidden alone, which doesn't prevent background scroll on iOS Safari.
   useEffect(() => {
     if (isMobileOpen) {
+      const scrollY = window.scrollY;
+      document.body.style.position = "fixed";
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = "100%";
       document.body.style.overflow = "hidden";
     } else {
+      const top = document.body.style.top;
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.width = "";
       document.body.style.overflow = "";
+      if (top) {
+        window.scrollTo(0, parseInt(top.replace("px", "") || "0") * -1);
+      }
     }
-    return () => { document.body.style.overflow = ""; };
+    return () => {
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.width = "";
+      document.body.style.overflow = "";
+    };
   }, [isMobileOpen]);
 
   useEffect(() => {
