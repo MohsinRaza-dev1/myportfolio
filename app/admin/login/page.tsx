@@ -20,14 +20,24 @@ export default function AdminLogin() {
     }
 
     setLoading(true);
-    // Simulate a small delay for UX
-    await new Promise((r) => setTimeout(r, 300));
 
-    if (password === process.env.NEXT_PUBLIC_ADMIN_PASSWORD || password === "admin123") {
-      sessionStorage.setItem("admin_authenticated", "true");
-      router.push("/admin/dashboard");
-    } else {
-      setError("Incorrect password.");
+    try {
+      const res = await fetch("/api/admin/auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }),
+      });
+
+      if (res.ok) {
+        sessionStorage.setItem("admin_authenticated", "true");
+        sessionStorage.setItem("admin_token", password);
+        router.push("/admin/dashboard");
+      } else {
+        setError("Incorrect password.");
+        setLoading(false);
+      }
+    } catch {
+      setError("Connection error. Please try again.");
       setLoading(false);
     }
   };

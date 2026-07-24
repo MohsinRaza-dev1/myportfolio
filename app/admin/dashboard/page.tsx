@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import {
   Save, LogOut, User, Briefcase, Wrench, FolderGit2, Settings,
   Award, Star, Image, Plus, Trash2, GripVertical, Upload,
+  MessageSquare, Key, ExternalLink, CheckCircle, XCircle, Search,
 } from "lucide-react";
 import type { SiteContent, ProfileData, WhyMeItem } from "@/lib/content-context";
 import type { SkillCategory } from "@/types";
@@ -18,7 +19,9 @@ type TabKey =
   | "skills"
   | "projects"
   | "services"
-  | "whyme";
+  | "whyme"
+  | "messages"
+  | "settings";
 
 const TABS: { key: TabKey; label: string; icon: React.ElementType }[] = [
   { key: "profile", label: "Profile", icon: User },
@@ -28,20 +31,22 @@ const TABS: { key: TabKey; label: string; icon: React.ElementType }[] = [
   { key: "projects", label: "Projects", icon: FolderGit2 },
   { key: "services", label: "Services", icon: Settings },
   { key: "whyme", label: "Why Me", icon: Award },
+  { key: "messages", label: "Messages", icon: MessageSquare },
+  { key: "settings", label: "Settings", icon: Key },
 ];
 
 // ─── Helpers ─────────────────────────────────────────────────────────────
 
 function getAuthHeaders(): HeadersInit {
   return {
-    Authorization: `Bearer admin123`,
+    Authorization: `Bearer ${typeof window !== "undefined" ? sessionStorage.getItem("admin_token") || "" : ""}`,
     "Content-Type": "application/json",
   };
 }
 
 function uploadAuthHeaders(): HeadersInit {
   return {
-    Authorization: `Bearer admin123`,
+    Authorization: `Bearer ${typeof window !== "undefined" ? sessionStorage.getItem("admin_token") || "" : ""}`,
   };
 }
 
@@ -412,6 +417,287 @@ function WhyMeTab({ items, onChange }: {
   );
 }
 
+// ─── Tab: Messages ────────────────────────────────────────────────────────
+
+function MessagesTab() {
+  const [messages, setMessages] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [replying, setReplying] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState("");
+
+  const fetchMessages = async () => {
+    try {
+      const res = await fetch("/api/admin/messages", { headers: getAuthHeaders() });
+      if (res.ok) setMessages(await res.json());
+    } catch { /* ignore */ }
+    setLoading(false);
+  };
+
+  useEffect(() => { fetchMessages(); }, []);
+
+  const toggleRead = async (id: string, read: boolean) => {
+    await fetch("/api/admin/messages", {
+      method: "PUT",
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ id, read }),
+    });
+    fetchMessages();
+  };
+
+  const sendReply = async (id: string) => {
+    if (!replyText.trim()) return;
+    await fetch("/api/admin/messages", {
+      method: "PUT",
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ id, reply: replyText.trim() }),
+    });
+    setReplyText("");
+    setReplying(null);
+    fetchMessages();
+  };
+
+  const deleteMessage = async (id: string) => {
+    await fetch("/api/admin/messages", {
+      method: "DELETE",
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ id }),
+    });
+    fetchMessages();
+  };
+
+  const unreadCount = messages.filter((m) => !m.read).length;
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary-500 border-t-transparent" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-dark-400">
+          {messages.length} message{messages.length !== 1 ? "s" : ""}
+          {unreadCount > 0 && (
+            <span className="ml-2 text-primary-400">({unreadCount} unread)</span>
+          )}
+        </p>
+      </div>
+
+      {messages.length === 0 ? (
+        <p className="py-10 text-center text-sm text-dark-500">No messages yet.</p>
+      ) : (
+        <div className="space-y-3">
+          {messages.map((msg) => (
+            <div
+              key={msg.id}
+              className={`rounded-xl border p-4 transition-colors ${
+                !msg.read
+                  ? "border-primary-500/30 bg-primary-500/5"
+                  : "border-dark-800 bg-dark-900/30"
+              }`}
+            >
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-medium text-white">{msg.name}</span>
+                    <span className="text-xs text-dark-500">&lt;{msg.email}&gt;</span>
+                    {!msg.read && (
+                      <span className="rounded-full bg-primary-500/20 px-2 py-0.5 text-[10px] font-medium text-primary-400">
+                        New
+                      </span>
+                    )}
+                  </div>
+                  <p className="mt-1 text-sm font-medium text-dark-300">{msg.subject}</p>
+                  <p className="mt-1 text-sm text-dark-400 whitespace-pre-wrap">{msg.message}</p>
+                  {msg.reply && (
+                    <div className="mt-3 rounded-lg border border-primary-500/20 bg-primary-500/5 p-3">
+                      <p className="text-[11px] font-medium uppercase tracking-wider text-primary-400">Your Reply</p>
+                      <p className="mt-1 text-sm text-dark-300">{msg.reply}</p>
+                    </div>
+                  )}
+                  <p className="mt-2 text-[11px] text-dark-500">
+                    {new Date(msg.createdAt).toLocaleString()}
+                  </p>
+                </div>
+                <div className="flex items-center gap-1 flex-shrink-0">
+                  <button
+                    onClick={() => toggleRead(msg.id, !msg.read)}
+                    className="rounded-lg p-2 text-dark-500 hover:text-primary-400 transition-colors"
+                    title={msg.read ? "Mark as unread" : "Mark as read"}
+                  >
+                    {msg.read ? <XCircle size={16} /> : <CheckCircle size={16} />}
+                  </button>
+                  <button
+                    onClick={() => setReplying(replying === msg.id ? null : msg.id)}
+                    className="rounded-lg p-2 text-dark-500 hover:text-primary-400 transition-colors"
+                    title="Reply"
+                  >
+                    <MessageSquare size={16} />
+                  </button>
+                  <button
+                    onClick={() => deleteMessage(msg.id)}
+                    className="rounded-lg p-2 text-dark-500 hover:text-red-400 transition-colors"
+                    title="Delete"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              </div>
+
+              {replying === msg.id && (
+                <div className="mt-3 border-t border-dark-800 pt-3">
+                  <textarea
+                    value={replyText}
+                    onChange={(e) => setReplyText(e.target.value)}
+                    rows={2}
+                    className="w-full rounded-lg border border-dark-800 bg-dark-950/50 px-3 py-2 text-sm text-white placeholder-dark-500 focus:border-primary-500/50 focus:outline-none"
+                    placeholder="Write your reply..."
+                  />
+                  <div className="mt-2 flex gap-2">
+                    <button
+                      onClick={() => sendReply(msg.id)}
+                      disabled={!replyText.trim()}
+                      className="rounded-lg bg-primary-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-primary-500 disabled:opacity-60"
+                    >
+                      Send Reply
+                    </button>
+                    <button
+                      onClick={() => { setReplying(null); setReplyText(""); }}
+                      className="rounded-lg border border-dark-700 px-3 py-1.5 text-xs text-dark-400 hover:text-white"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Tab: Settings ────────────────────────────────────────────────────────
+
+function SettingsTab() {
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [statusMsg, setStatusMsg] = useState("");
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setStatusMsg("");
+
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      setStatus("error");
+      setStatusMsg("All fields are required.");
+      return;
+    }
+
+    if (newPassword.length < 4) {
+      setStatus("error");
+      setStatusMsg("New password must be at least 4 characters.");
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setStatus("error");
+      setStatusMsg("Passwords do not match.");
+      return;
+    }
+
+    setStatus("loading");
+    try {
+      const res = await fetch("/api/admin/password", {
+        method: "PUT",
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ currentPassword, newPassword }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        sessionStorage.setItem("admin_token", newPassword);
+        setStatus("success");
+        setStatusMsg("Password changed successfully!");
+        setCurrentPassword("");
+        setNewPassword("");
+        setConfirmPassword("");
+        setTimeout(() => setStatus("idle"), 3000);
+      } else {
+        setStatus("error");
+        setStatusMsg(data.error || "Failed to change password.");
+      }
+    } catch {
+      setStatus("error");
+      setStatusMsg("Connection error. Please try again.");
+    }
+  };
+
+  return (
+    <div className="space-y-8 max-w-lg">
+      {/* Change Password */}
+      <div>
+        <h3 className="text-lg font-semibold text-white">Change Password</h3>
+        <p className="mt-1 text-sm text-dark-400">Update your admin panel password.</p>
+
+        <form onSubmit={handleChangePassword} className="mt-4 space-y-4">
+          <div>
+            <label className="mb-1 block text-sm text-dark-400">Current Password</label>
+            <input
+              type="password"
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+              className="w-full rounded-lg border border-dark-800 bg-dark-950/50 px-3 py-2 text-sm text-white placeholder-dark-500 focus:border-primary-500/50 focus:outline-none"
+              placeholder="Current password"
+            />
+          </div>
+          <div>
+            <label className="mb-1 block text-sm text-dark-400">New Password</label>
+            <input
+              type="password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              className="w-full rounded-lg border border-dark-800 bg-dark-950/50 px-3 py-2 text-sm text-white placeholder-dark-500 focus:border-primary-500/50 focus:outline-none"
+              placeholder="New password (min 4 characters)"
+            />
+          </div>
+          <div>
+            <label className="mb-1 block text-sm text-dark-400">Confirm New Password</label>
+            <input
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className="w-full rounded-lg border border-dark-800 bg-dark-950/50 px-3 py-2 text-sm text-white placeholder-dark-500 focus:border-primary-500/50 focus:outline-none"
+              placeholder="Confirm new password"
+            />
+          </div>
+
+          {statusMsg && (
+            <p className={`text-sm ${status === "error" ? "text-red-400" : "text-emerald-400"}`}>
+              {statusMsg}
+            </p>
+          )}
+
+          <button
+            type="submit"
+            disabled={status === "loading"}
+            className="rounded-lg bg-primary-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-primary-500 disabled:opacity-60"
+          >
+            {status === "loading" ? "Changing..." : "Change Password"}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 // ─── Main Dashboard Page ─────────────────────────────────────────────────
 
 export default function AdminDashboard() {
@@ -560,19 +846,23 @@ export default function AdminDashboard() {
               {activeTab === "whyme" && (
                 <WhyMeTab items={content.whyMe} onChange={(items) => setContent({ ...content, whyMe: items })} />
               )}
+              {activeTab === "messages" && <MessagesTab />}
+              {activeTab === "settings" && <SettingsTab />}
             </div>
 
-            {/* Bottom save */}
-            <div className="mt-6 flex justify-end">
-              <button
-                onClick={handleSave}
-                disabled={saving}
-                className="flex items-center gap-1.5 rounded-lg bg-primary-600 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary-500 disabled:opacity-60"
-              >
-                <Save size={16} />
-                {saving ? "Saving..." : saved ? "Saved!" : "Save All Changes"}
-              </button>
-            </div>
+            {/* Bottom save (only for content tabs) */}
+            {activeTab !== "messages" && activeTab !== "settings" && (
+              <div className="mt-6 flex justify-end">
+                <button
+                  onClick={handleSave}
+                  disabled={saving}
+                  className="flex items-center gap-1.5 rounded-lg bg-primary-600 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary-500 disabled:opacity-60"
+                >
+                  <Save size={16} />
+                  {saving ? "Saving..." : saved ? "Saved!" : "Save All Changes"}
+                </button>
+              </div>
+            )}
           </main>
         </div>
       </div>
