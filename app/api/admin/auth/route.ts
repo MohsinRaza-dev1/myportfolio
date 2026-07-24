@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getSupabase } from "../../../../lib/supabase";
 
 export async function POST(request: NextRequest) {
   try {
@@ -8,7 +9,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Password is required" }, { status: 400 });
     }
 
-    if (password === process.env.ADMIN_PASSWORD) {
+    const db = getSupabase();
+    const { data, error } = await db
+      .from("admin_settings")
+      .select("password")
+      .eq("id", 1)
+      .single();
+
+    if (error || !data) {
+      return NextResponse.json({ error: "Server configuration error" }, { status: 500 });
+    }
+
+    if (password === data.password) {
       return NextResponse.json({ success: true });
     }
 

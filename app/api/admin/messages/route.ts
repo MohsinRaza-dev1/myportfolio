@@ -1,77 +1,97 @@
 import { NextRequest, NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
+import { getSupabase } from "../../../../lib/supabase";
 
-const messagesPath = path.join(process.cwd(), "data", "messages.json");
-
-function unauthorized() {
-  return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-}
-
-function readMessages(): any[] {
-  try {
-    return JSON.parse(fs.readFileSync(messagesPath, "utf-8"));
-  } catch {
-    return [];
-  }
-}
-
-function writeMessages(messages: any[]) {
-  fs.writeFileSync(messagesPath, JSON.stringify(messages, null, 2), "utf-8");
-}
-
-// GET /api/admin/messages — list all messages
 export async function GET(request: NextRequest) {
   const authHeader = request.headers.get("authorization") || "";
   const token = authHeader.replace("Bearer ", "");
-  if (token !== process.env.ADMIN_PASSWORD) return unauthorized();
 
-  const messages = readMessages();
-  return NextResponse.json(messages);
+  const db = getSupabase();
+  const { data: settings } = await db
+    .from("admin_settings")
+    .select("password")
+    .eq("id", 1)
+    .single();
+
+  if (!settings || token !== settings.password) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { data: messages, error } = await db
+    .from("messages")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    return NextResponse.json([], { status: 200 });
+  }
+
+  return NextResponse.json(messages || []);
 }
 
-// PUT /api/admin/messages — update a message (mark as read, add reply)
 export async function PUT(request: NextRequest) {
   const authHeader = request.headers.get("authorization") || "";
   const token = authHeader.replace("Bearer ", "");
-  if (token !== process.env.ADMIN_PASSWORD) return unauthorized();
+
+  const db2 = getSupabase();
+  const { data: settings } = await db2
+    .from("admin_settings")
+    .select("password")
+    .eq("id", 1)
+    .single();
+
+  if (!settings || token !== settings.password) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
   try {
     const { id, read, reply } = await request.json();
-    const messages = readMessages();
-    const idx = messages.findIndex((m) => m.id === id);
 
-    if (idx === -1) {
+    const updates: Record<string, any> = {};
+    if (read !== undefined) updates.read = read;
+    if (reply !== undefined) updates.reply = reply;
+
+    const { error } = await db2
+      .from("messages")
+      .update(updates)
+      .eq("id", id);
+
+    if (error) {
       return NextResponse.json({ error: "Message not found" }, { status: 404 });
     }
 
-    if (read !== undefined) messages[idx].read = read;
-    if (reply !== undefined) messages[idx].reply = reply;
-
-    writeMessages(messages);
     return NextResponse.json({ success: true });
   } catch {
     return NextResponse.json({ error: "Invalid request" }, { status: 400 });
   }
 }
 
-// DELETE /api/admin/messages — delete a message
 export async function DELETE(request: NextRequest) {
   const authHeader = request.headers.get("authorization") || "";
   const token = authHeader.replace("Bearer ", "");
-  if (token !== process.env.ADMIN_PASSWORD) return unauthorized();
+
+  const db3 = getSupabase();
+  const { data: settings } = await db3
+    .from("admin_settings")
+    .select("password")
+    .eq("id", 1)
+    .single();
+
+  if (!settings || token !== settings.password) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
   try {
     const { id } = await request.json();
-    let messages = readMessages();
-    const idx = messages.findIndex((m) => m.id === id);
 
-    if (idx === -1) {
+    const { error } = await db3
+      .from("messages")
+      .delete()
+      .eq("id", id);
+
+    if (error) {
       return NextResponse.json({ error: "Message not found" }, { status: 404 });
     }
 
-    messages.splice(idx, 1);
-    writeMessages(messages);
     return NextResponse.json({ success: true });
   } catch {
     return NextResponse.json({ error: "Invalid request" }, { status: 400 });

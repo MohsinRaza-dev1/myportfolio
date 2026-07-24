@@ -1,21 +1,36 @@
 import { NextRequest, NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
-
-const contentPath = path.join(process.cwd(), "data", "content.json");
-
-function unauthorized() {
-  return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-}
+import { getSupabase } from "../../../../lib/supabase";
 
 export async function PUT(request: NextRequest) {
   const authHeader = request.headers.get("authorization") || "";
   const token = authHeader.replace("Bearer ", "");
-  if (token !== process.env.ADMIN_PASSWORD) return unauthorized();
+
+  const db = getSupabase();
+  const { data: settings } = await db
+    .from("admin_settings")
+    .select("password")
+    .eq("id", 1)
+    .single();
+
+  if (!settings || token !== settings.password) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
   try {
     const body = await request.json();
-    fs.writeFileSync(contentPath, JSON.stringify(body, null, 2), "utf-8");
+
+    const { error } = await db
+      .from("site_content")
+      .upsert({
+        id: 1,
+        data: body,
+        updated_at: new Date().toISOString(),
+      });
+
+    if (error) {
+      return NextResponse.json({ error: "Failed to save content" }, { status: 500 });
+    }
+
     return NextResponse.json({ success: true });
   } catch {
     return NextResponse.json({ error: "Failed to save content" }, { status: 500 });

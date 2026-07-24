@@ -1,56 +1,41 @@
 import { NextRequest, NextResponse } from "next/server";
 import nodemailer from "nodemailer";
-import fs from "fs";
-import path from "path";
-
-const messagesPath = path.join(process.cwd(), "data", "messages.json");
-
-function readMessages(): any[] {
-  try {
-    return JSON.parse(fs.readFileSync(messagesPath, "utf-8"));
-  } catch {
-    return [];
-  }
-}
+import { getSupabase } from "../../../lib/supabase";
 
 export async function POST(request: NextRequest) {
   try {
     const { name, email, subject, message } = await request.json();
 
-    // Validate
     if (!name?.trim() || !email?.trim() || !subject?.trim() || !message?.trim()) {
-      return NextResponse.json(
-        { error: "All fields are required." },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "All fields are required." }, { status: 400 });
     }
 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      return NextResponse.json(
-        { error: "Invalid email address." },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Invalid email address." }, { status: 400 });
     }
 
-    // Save message to storage (fail gracefully on serverless)
+    // Save message to Supabase
     let savedLocally = false;
-    try {
-      const messages = readMessages();
-      const newMsg = {
-        id: Date.now().toString(),
-        name: name.trim(),
-        email: email.trim(),
-        subject: subject.trim(),
-        message: message.trim(),
-        createdAt: new Date().toISOString(),
-        read: false,
-        reply: null,
-      };
-      messages.unshift(newMsg);
-      fs.writeFileSync(messagesPath, JSON.stringify(messages, null, 2), "utf-8");
+    const newMsg = {
+      id: Date.now().toString(),
+      name: name.trim(),
+      email: email.trim(),
+      subject: subject.trim(),
+      message: message.trim(),
+      created_at: new Date().toISOString(),
+      read: false,
+      reply: null,
+    };
+
+    const db = getSupabase();
+    const { error: dbError } = await db
+      .from("messages")
+      .insert([newMsg]);
+
+    if (!dbError) {
       savedLocally = true;
-    } catch (storageErr) {
-      console.error("Failed to save message locally:", storageErr);
+    } else {
+      console.error("Failed to save message to Supabase:", dbError);
     }
 
     // Try sending email
