@@ -9,18 +9,24 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Password is required" }, { status: 400 });
     }
 
-    const db = getSupabase();
-    const { data, error } = await db
-      .from("admin_settings")
-      .select("password")
-      .eq("id", 1)
-      .single();
+    // Try Supabase first
+    try {
+      const db = getSupabase();
+      const { data, error } = await db
+        .from("admin_settings")
+        .select("password")
+        .eq("id", 1)
+        .single();
 
-    if (error || !data) {
-      return NextResponse.json({ error: "Server configuration error" }, { status: 500 });
+      if (!error && data && password === data.password) {
+        return NextResponse.json({ success: true });
+      }
+    } catch {
+      // Supabase not available, fall through
     }
 
-    if (password === data.password) {
+    // Fallback: check ADMIN_PASSWORD env var (works on Vercel without Supabase setup)
+    if (password === process.env.ADMIN_PASSWORD) {
       return NextResponse.json({ success: true });
     }
 
