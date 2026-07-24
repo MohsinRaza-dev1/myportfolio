@@ -20,22 +20,16 @@ export default function About() {
           {/* Left - Main Content */}
           <div className="md:col-span-3">
             <h2 className="inline-block text-3xl font-bold text-white md:text-4xl">
-              About Me<span className="ml-1 text-primary-500">.</span>
+              About Me<span className="ml-1 text-primary-500"></span>
             </h2>
             <p className="mt-6 text-base leading-relaxed text-dark-300">
               {profile.about}
             </p>
             <p className="mt-4 text-base leading-relaxed text-dark-400">
-              I specialize in building modern web applications with Python and
-              FastAPI on the backend, and Next.js with TypeScript on the
-              frontend. My experience extends into Generative AI, Large Language
-              Models, and intelligent automation — allowing me to create
-              applications that are not just functional but truly intelligent.
+             
             </p>
             <p className="mt-4 text-base leading-relaxed text-dark-400">
-              Whether it is designing a scalable API, building an AI-powered
-              chatbot, or developing a complete SaaS platform, I focus on writing
-              clean, maintainable code and delivering real value.
+             
             </p>
 
             {/* Education */}

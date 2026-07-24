@@ -66,7 +66,7 @@ export default function Skills() {
                     scale: 1,
                     transition: { delay: i * 0.03 },
                   }}
-                  className="group rounded-xl border border-dark-800 bg-dark-900/50 p-4 text-center transition-all hover:border-primary-500/30 hover:bg-dark-900 hover:shadow-[0_0_15px_rgba(59,130,246,0.05)]"
+                  className="group rounded-xl border border-dark-800 bg-dark-900/50 p-4 text-center transition-all hover:border-primary-500/30 hover:bg-dark-900 hover:shadow-[0_0_15px_rgba(var(--primary-500-rgb),0.05)]"
                 >
                   <span className="text-sm font-medium text-dark-300 transition-colors group-hover:text-white">
                     {skill.name}

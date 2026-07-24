@@ -6,7 +6,7 @@ import { Send, CheckCircle, AlertCircle, Mail, MapPin } from "lucide-react";
 import { profile } from "@/data";
 import AnimatedSection from "@/components/AnimatedSection";
 import SocialLinks from "@/components/ui/SocialLinks";
-import ButtonLoader from "@/components/ui/ButtonLoader";
+import RadialLoader from "@/components/ui/RadialLoader";
 
 export default function Contact() {
   const [formState, setFormState] = useState({
@@ -40,13 +40,28 @@ export default function Contact() {
     setStatus("loading");
     setErrorMsg("");
 
-    // Simulate sending — in production, connect to an API
-    await new Promise((r) => setTimeout(r, 1500));
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formState),
+      });
 
-    // For now just success
-    setStatus("success");
-    setFormState({ name: "", email: "", subject: "", message: "" });
-    setTimeout(() => setStatus("idle"), 5000);
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to send message.");
+      }
+
+      setStatus("success");
+      setFormState({ name: "", email: "", subject: "", message: "" });
+      setTimeout(() => setStatus("idle"), 5000);
+    } catch (err) {
+      setStatus("error");
+      setErrorMsg(
+        err instanceof Error ? err.message : "Something went wrong. Please try again."
+      );
+    }
   };
 
   return (
@@ -172,7 +187,7 @@ export default function Contact() {
               >
                 {status === "loading" ? (
                   <>
-                    <ButtonLoader size={18} />
+                    <RadialLoader size="small" />
                     Sending...
                   </>
                 ) : (

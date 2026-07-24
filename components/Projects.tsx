@@ -30,7 +30,7 @@ export default function Projects() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1, duration: 0.5 }}
-              className="group flex flex-col rounded-xl border border-dark-800 bg-dark-900/50 transition-all hover:border-primary-500/30 hover:shadow-[0_0_30px_rgba(59,130,246,0.05)]"
+              className="group flex flex-col rounded-xl border border-dark-800 bg-dark-900/50 transition-all hover:border-primary-500/30 hover:shadow-[0_0_30px_rgba(var(--primary-500-rgb),0.05)]"
             >
               {/* Header */}
               <div className="p-6 pb-0">

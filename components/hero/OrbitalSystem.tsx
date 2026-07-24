@@ -12,11 +12,8 @@ interface OrbitalSystemProps {
   orbitalCount?: number;
   particleDensity?: number;
   enableMouseInteraction?: boolean;
+  accentColor?: string;
 }
-
-// ─── Constants ───────────────────────────────────────────────────────────────
-
-const ELECTRON_COLORS = ["#3b82f6", "#60a5fa", "#93c5fd", "#2563eb", "#1d4ed8"];
 
 // ─── Electron ────────────────────────────────────────────────────────────────
 
@@ -97,14 +94,15 @@ interface OrbitalRingProps {
   tiltX: number;
   tiltZ: number;
   opacity: number;
+  color: string;
 }
 
-function OrbitalRing({ radius, tiltX, tiltZ, opacity }: OrbitalRingProps) {
+function OrbitalRing({ radius, tiltX, tiltZ, opacity, color }: OrbitalRingProps) {
   return (
     <mesh rotation-x={tiltX} rotation-z={tiltZ}>
       <ringGeometry args={[radius - 0.01, radius, 80]} />
       <meshBasicMaterial
-        color="#3b82f6"
+        color={color}
         transparent
         opacity={opacity}
         side={THREE.DoubleSide}
@@ -116,7 +114,7 @@ function OrbitalRing({ radius, tiltX, tiltZ, opacity }: OrbitalRingProps) {
 
 // ─── Core ────────────────────────────────────────────────────────────────────
 
-function Core() {
+function Core({ color }: { color: string }) {
   const ref = useRef<THREE.Mesh>(null!);
   const glowRef = useRef<THREE.Mesh>(null!);
 
@@ -135,13 +133,13 @@ function Core() {
       {/* Inner core */}
       <mesh ref={ref}>
         <sphereGeometry args={[0.2, 24, 24]} />
-        <meshBasicMaterial color="#60a5fa" />
+        <meshBasicMaterial color={color} />
       </mesh>
       {/* Glow layer */}
       <mesh ref={glowRef}>
         <sphereGeometry args={[0.4, 24, 24]} />
         <meshBasicMaterial
-          color="#3b82f6"
+          color={color}
           transparent
           opacity={0.2}
           depthWrite={false}
@@ -153,7 +151,7 @@ function Core() {
 
 // ─── Particles ───────────────────────────────────────────────────────────────
 
-function BackgroundParticles({ density = 1 }: { density?: number }) {
+function BackgroundParticles({ density = 1, color }: { density?: number; color: string }) {
   const ref = useRef<THREE.Points>(null!);
   const count = Math.floor(60 * density);
 
@@ -186,7 +184,7 @@ function BackgroundParticles({ density = 1 }: { density?: number }) {
       </bufferGeometry>
       <pointsMaterial
         size={0.025}
-        color="#3b82f6"
+        color={color}
         transparent
         opacity={0.2}
         blending={THREE.AdditiveBlending}
@@ -204,6 +202,7 @@ function SceneContent({
   orbitalCount = 4,
   particleDensity = 1,
   enableMouseInteraction = true,
+  accentColor = "#3b82f6",
 }: OrbitalSystemProps) {
   const groupRef = useRef<THREE.Group>(null!);
   const targetRotation = useRef({ x: 0, y: 0 });
@@ -211,7 +210,6 @@ function SceneContent({
 
   useFrame(({ clock }) => {
     if (enableMouseInteraction) {
-      // Smooth interpolation toward pointer
       targetRotation.current.x +=
         (pointer.y * 0.3 - targetRotation.current.x) * 0.03;
       targetRotation.current.y +=
@@ -221,7 +219,6 @@ function SceneContent({
       groupRef.current.rotation.y = targetRotation.current.y;
     }
 
-    // Slow auto-rotation
     groupRef.current.rotation.z += 0.002 * rotationSpeed;
   });
 
@@ -249,9 +246,21 @@ function SceneContent({
     return items;
   }, [orbitalCount, electronCount]);
 
+  // Generate palette from the accent color
+  const electronColors = useMemo(() => {
+    const c = new THREE.Color(accentColor);
+    return [
+      accentColor,
+      c.clone().multiplyScalar(1.2).getStyle(),
+      c.clone().multiplyScalar(1.4).getStyle(),
+      c.clone().multiplyScalar(0.8).getStyle(),
+      c.clone().multiplyScalar(0.6).getStyle(),
+    ];
+  }, [accentColor]);
+
   return (
     <group ref={groupRef}>
-      <Core />
+      <Core color={electronColors[0]} />
 
       {orbitals.map((orb, i) => (
         <group key={i}>
@@ -260,6 +269,7 @@ function SceneContent({
             tiltX={orb.tiltX}
             tiltZ={orb.tiltZ}
             opacity={0.15 + i * 0.03}
+            color={accentColor}
           />
           {Array.from({ length: orb.elecCount }).map((_, j) => (
             <Electron
@@ -269,13 +279,13 @@ function SceneContent({
               offset={(j / orb.elecCount) * Math.PI * 2}
               tiltX={orb.tiltX}
               tiltZ={orb.tiltZ}
-              color={ELECTRON_COLORS[j % ELECTRON_COLORS.length]}
+              color={electronColors[j % electronColors.length]}
             />
           ))}
         </group>
       ))}
 
-      <BackgroundParticles density={particleDensity} />
+      <BackgroundParticles density={particleDensity} color={accentColor} />
     </group>
   );
 }
@@ -288,17 +298,34 @@ export default function OrbitalSystem({
   orbitalCount = 4,
   particleDensity = 1,
   enableMouseInteraction = true,
+  accentColor,
 }: OrbitalSystemProps) {
   const [mounted, setMounted] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
+  const [cssColor, setCssColor] = useState("#3b82f6");
 
   useEffect(() => {
     setMounted(true);
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
     setReducedMotion(mq.matches);
+
+    // Read the CSS variable for accent color
+    const readColor = () => {
+      const root = document.documentElement;
+      const val = getComputedStyle(root).getPropertyValue("--primary-500").trim();
+      if (val) setCssColor(val);
+    };
+    readColor();
+
+    // Listen for theme changes
+    const observer = new MutationObserver(readColor);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["style"] });
+    return () => observer.disconnect();
   }, []);
 
-  // SSR placeholder — nothing rendered
+  const color = accentColor || cssColor;
+
+  // SSR placeholder
   if (!mounted) {
     return <div className="h-full w-full" />;
   }
@@ -307,9 +334,18 @@ export default function OrbitalSystem({
     return (
       <div className="flex h-full w-full items-center justify-center">
         <div className="relative h-32 w-32">
-          <div className="absolute inset-0 animate-glow rounded-full bg-primary-500/20 blur-2xl" />
-          <div className="absolute inset-2 rounded-full bg-primary-500/10" />
-          <div className="absolute inset-4 rounded-full bg-primary-500/5" />
+          <div
+            className="absolute inset-0 animate-glow rounded-full blur-2xl"
+            style={{ background: `${color}33` }}
+          />
+          <div
+            className="absolute inset-2 rounded-full"
+            style={{ background: `${color}1A` }}
+          />
+          <div
+            className="absolute inset-4 rounded-full"
+            style={{ background: `${color}0D` }}
+          />
         </div>
       </div>
     );
@@ -332,6 +368,7 @@ export default function OrbitalSystem({
         orbitalCount={orbitalCount}
         particleDensity={particleDensity}
         enableMouseInteraction={enableMouseInteraction}
+        accentColor={color}
       />
     </Canvas>
   );

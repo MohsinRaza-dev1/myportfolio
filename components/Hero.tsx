@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { ArrowDown, FileText, Download } from "lucide-react";
 import { profile } from "@/data";
 import { scrollToSection } from "@/lib/utils";
 import SocialLinks from "@/components/ui/SocialLinks";
-import Loader from "@/components/ui/Loader";
+import RadialLoader from "@/components/ui/RadialLoader";
 import dynamic from "next/dynamic";
 
 const OrbitalSystem = dynamic(
@@ -17,15 +17,22 @@ const OrbitalSystem = dynamic(
 
 export default function Hero() {
   const [viewingResume, setViewingResume] = useState(false);
+  const [downloadingCv, setDownloadingCv] = useState(false);
 
-  const handleViewResume = () => {
+  const handleViewResume = useCallback(() => {
     setViewingResume(true);
-    // Show loader briefly, then open PDF in new tab
     setTimeout(() => {
       window.open(profile.resumePath, "_blank", "noopener,noreferrer");
       setViewingResume(false);
     }, 800);
-  };
+  }, []);
+
+  const handleDownloadCv = useCallback(() => {
+    setDownloadingCv(true);
+    // Let the loader show for a moment before the download starts naturally
+    // The browser handles the download — we restore state after a short delay
+    setTimeout(() => setDownloadingCv(false), 1200);
+  }, []);
 
   return (
     <section
@@ -40,7 +47,7 @@ export default function Hero() {
       <div className="pointer-events-none absolute -top-40 right-0 h-[500px] w-[500px] rounded-full bg-primary-500/5 blur-[120px]" />
       <div className="pointer-events-none absolute -bottom-40 left-0 h-[400px] w-[400px] rounded-full bg-primary-500/3 blur-[100px]" />
 
-      <div className="relative mx-auto flex w-full max-w-6xl flex-col items-center px-6 pt-28 pb-16 md:flex-row md:gap-16">
+      <div className="relative mx-auto flex w-full max-w-6xl flex-col items-center px-6 pt-20 pb-16 md:flex-row md:gap-16">
         {/* Text Content */}
         <div className="flex-1 text-center md:text-left">
           {/* Profile Image - Circular, above heading */}
@@ -113,7 +120,7 @@ export default function Hero() {
           >
             <button
               onClick={() => scrollToSection("projects")}
-              className="rounded-lg bg-primary-600 px-6 py-3 font-medium text-white transition-all hover:bg-primary-500 hover:shadow-[0_0_20px_rgba(59,130,246,0.3)]"
+              className="rounded-lg bg-primary-600 px-6 py-3 font-medium text-white transition-all hover:bg-primary-500 hover:shadow-[0_0_20px_rgba(var(--primary-500-rgb),0.3)]"
             >
               View My Work
             </button>
@@ -125,18 +132,37 @@ export default function Hero() {
             </button>
             <button
               onClick={() => handleViewResume()}
-              className="flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium text-dark-400 transition-colors hover:text-primary-400"
+              disabled={viewingResume}
+              className="flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium text-dark-400 transition-colors hover:text-primary-400 disabled:opacity-60"
             >
-              <FileText size={16} />
-              View Resume
+              {viewingResume ? (
+                <RadialLoader size="small" />
+              ) : (
+                <FileText size={16} />
+              )}
+              {viewingResume ? "Opening..." : "View Resume"}
             </button>
             <a
               href={profile.resumePath}
               download
-              className="flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium text-dark-400 transition-colors hover:text-primary-400"
+              onClick={(e) => {
+                // Only show loader state for simulated delay, let native download proceed
+                if (!downloadingCv) {
+                  handleDownloadCv();
+                }
+              }}
+              className={`flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium transition-colors ${
+                downloadingCv
+                  ? "text-primary-400 pointer-events-none"
+                  : "text-dark-400 hover:text-primary-400"
+              }`}
             >
-              <Download size={16} />
-              Download CV
+              {downloadingCv ? (
+                <RadialLoader size="small" />
+              ) : (
+                <Download size={16} />
+              )}
+              {downloadingCv ? "Preparing..." : "Download CV"}
             </a>
           </motion.div>
 
@@ -151,12 +177,12 @@ export default function Hero() {
 
         {/* Right side - 3D Orbital System */}
         <motion.div
-          className="hidden flex-1 md:block"
+          className="flex-1"
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8, delay: 0.3 }}
         >
-          <div className="relative h-[400px] w-full md:h-[450px]">
+          <div className="relative h-[250px] w-full md:h-[450px]">
             {/* Glow behind scene */}
             <div className="absolute -inset-10 rounded-full bg-primary-500/10 blur-[100px]" />
             <div className="absolute -inset-20 rounded-full bg-primary-500/5 blur-[120px]" />
@@ -179,9 +205,6 @@ export default function Hero() {
       >
         <ArrowDown size={20} />
       </motion.button>
-
-      {/* CV Loader - fullscreen overlay with "Wait" text */}
-      <Loader fullScreen text="Wait" visible={viewingResume} timeout={0} />
     </section>
   );
 }

@@ -41,7 +41,7 @@ export default function Services() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.08, duration: 0.5 }}
-                className="group rounded-xl border border-dark-800 bg-dark-900/50 p-6 transition-all hover:border-primary-500/30 hover:shadow-[0_0_20px_rgba(59,130,246,0.05)]"
+                className="group rounded-xl border border-dark-800 bg-dark-900/50 p-6 transition-all hover:border-primary-500/30 hover:shadow-[0_0_20px_rgba(var(--primary-500-rgb),0.05)]"
               >
                 <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary-500/10 text-primary-400 transition-colors group-hover:bg-primary-500/20">
                   <Icon size={24} />

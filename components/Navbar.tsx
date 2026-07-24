@@ -1,18 +1,28 @@
 "use client";
 
-import { useState, useEffect, Fragment } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { navItems } from "@/data";
 import { scrollToSection } from "@/lib/utils";
 import { cn } from "@/lib/utils";
-import Loader from "@/components/ui/Loader";
+import RadialLoader from "@/components/ui/RadialLoader";
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
   const [navigating, setNavigating] = useState(""); // section id being navigated to
+
+  // Lock body scroll when mobile menu is open (prevents menu from shifting with page)
+  useEffect(() => {
+    if (isMobileOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [isMobileOpen]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -42,8 +52,8 @@ export default function Navbar() {
     // Short delay to let the loader appear before scrolling
     setTimeout(() => {
       scrollToSection(sectionId);
-      // Keep navigating true long enough for Loader's timeout + exit fade
-      setTimeout(() => setNavigating(""), 1800);
+      // Keep navigating true long enough for the radial loader to show
+      setTimeout(() => setNavigating(""), 1000);
     }, 400);
   };
 
@@ -62,7 +72,7 @@ export default function Navbar() {
           onClick={() => handleNav("#home")}
           className="text-xl font-bold text-white"
         >
-          Mohsin<span className="text-primary-500">.</span>
+          <span className="text-primary-500"></span>
         </button>
 
         {/* Desktop Nav */}
@@ -153,10 +163,20 @@ export default function Navbar() {
 
     </header>
 
-      {/* Navigation Loader - outside header to avoid backdrop-filter breaking fixed positioning */}
-      {navigating && (
-        <Loader fullScreen timeout={1200} />
-      )}
+      {/* Navigation Loader - subtle overlay with radial loader */}
+      <AnimatePresence>
+        {navigating && (
+          <motion.div
+            className="fixed inset-0 z-[9999] flex items-center justify-center bg-dark-950/80 backdrop-blur-sm"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <RadialLoader size="medium" segmentCount={14} />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }
