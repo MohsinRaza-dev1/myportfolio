@@ -1,64 +1,68 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabase } from "../../../../lib/supabase";
 
+function unauthorized() {
+  return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+}
+
+async function verifyAuth(token: string): Promise<boolean> {
+  try {
+    const db = getSupabase();
+    const { data } = await db.from("admin_settings").select("password").eq("id", 1).single();
+    if (data && token === data.password) return true;
+  } catch {}
+  return token === process.env.ADMIN_PASSWORD;
+}
+
 export async function GET(request: NextRequest) {
-  const authHeader = request.headers.get("authorization") || "";
-  const token = authHeader.replace("Bearer ", "");
+  const token = (request.headers.get("authorization") || "").replace("Bearer ", "");
+  if (!(await verifyAuth(token))) return unauthorized();
 
-  const db = getSupabase();
-  const { data: settings } = await db
-    .from("admin_settings")
-    .select("password")
-    .eq("id", 1)
-    .single();
+  try {
+    const db = getSupabase();
+    const { data: messages } = await db.from("messages").select("*").order("created_at", { ascending: false });
+    if (messages) return NextResponse.json(messages);
+  } catch {}
 
-  if (!settings || token !== settings.password) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  // Fallback: local file
+  try {
+    const fs = await import("fs");
+    const path = await import("path");
+    const raw = fs.readFileSync(path.join(process.cwd(), "data", "messages.json"), "utf-8");
+    return NextResponse.json(JSON.parse(raw));
+  } catch {
+    return NextResponse.json([]);
   }
-
-  const { data: messages, error } = await db
-    .from("messages")
-    .select("*")
-    .order("created_at", { ascending: false });
-
-  if (error) {
-    return NextResponse.json([], { status: 200 });
-  }
-
-  return NextResponse.json(messages || []);
 }
 
 export async function PUT(request: NextRequest) {
-  const authHeader = request.headers.get("authorization") || "";
-  const token = authHeader.replace("Bearer ", "");
-
-  const db2 = getSupabase();
-  const { data: settings } = await db2
-    .from("admin_settings")
-    .select("password")
-    .eq("id", 1)
-    .single();
-
-  if (!settings || token !== settings.password) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const token = (request.headers.get("authorization") || "").replace("Bearer ", "");
+  if (!(await verifyAuth(token))) return unauthorized();
 
   try {
     const { id, read, reply } = await request.json();
 
-    const updates: Record<string, any> = {};
-    if (read !== undefined) updates.read = read;
-    if (reply !== undefined) updates.reply = reply;
+    // Try Supabase first
+    try {
+      const db = getSupabase();
+      const updates: Record<string, any> = {};
+      if (read !== undefined) updates.read = read;
+      if (reply !== undefined) updates.reply = reply;
+      const { error } = await db.from("messages").update(updates).eq("id", id);
+      if (!error) return NextResponse.json({ success: true });
+    } catch {}
 
-    const { error } = await db2
-      .from("messages")
-      .update(updates)
-      .eq("id", id);
-
-    if (error) {
-      return NextResponse.json({ error: "Message not found" }, { status: 404 });
-    }
-
+    // Fallback: local file
+    const fs = await import("fs");
+    const path = await import("path");
+    const messagesPath = path.join(process.cwd(), "data", "messages.json");
+    let messages: any[] = [];
+    try { messages = JSON.parse(fs.readFileSync(messagesPath, "utf-8")); } catch {}
+    const idx = messages.findIndex((m: any) => m.id === id);
+    if (idx === -1) return NextResponse.json({ error: "Message not found" }, { status: 404 });
+    if (read !== undefined) messages[idx].read = read;
+    if (reply !== undefined) messages[idx].reply = reply;
+    fs.writeFileSync(messagesPath, JSON.stringify(messages, null, 2), "utf-8");
     return NextResponse.json({ success: true });
   } catch {
     return NextResponse.json({ error: "Invalid request" }, { status: 400 });
@@ -66,32 +70,29 @@ export async function PUT(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
-  const authHeader = request.headers.get("authorization") || "";
-  const token = authHeader.replace("Bearer ", "");
-
-  const db3 = getSupabase();
-  const { data: settings } = await db3
-    .from("admin_settings")
-    .select("password")
-    .eq("id", 1)
-    .single();
-
-  if (!settings || token !== settings.password) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const token = (request.headers.get("authorization") || "").replace("Bearer ", "");
+  if (!(await verifyAuth(token))) return unauthorized();
 
   try {
     const { id } = await request.json();
 
-    const { error } = await db3
-      .from("messages")
-      .delete()
-      .eq("id", id);
+    // Try Supabase first
+    try {
+      const db = getSupabase();
+      const { error } = await db.from("messages").delete().eq("id", id);
+      if (!error) return NextResponse.json({ success: true });
+    } catch {}
 
-    if (error) {
-      return NextResponse.json({ error: "Message not found" }, { status: 404 });
-    }
-
+    // Fallback: local file
+    const fs = await import("fs");
+    const path = await import("path");
+    const messagesPath = path.join(process.cwd(), "data", "messages.json");
+    let messages: any[] = [];
+    try { messages = JSON.parse(fs.readFileSync(messagesPath, "utf-8")); } catch {}
+    const idx = messages.findIndex((m: any) => m.id === id);
+    if (idx === -1) return NextResponse.json({ error: "Message not found" }, { status: 404 });
+    messages.splice(idx, 1);
+    fs.writeFileSync(messagesPath, JSON.stringify(messages, null, 2), "utf-8");
     return NextResponse.json({ success: true });
   } catch {
     return NextResponse.json({ error: "Invalid request" }, { status: 400 });
