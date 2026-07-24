@@ -32,20 +32,26 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Save message to storage
-    const messages = readMessages();
-    const newMsg = {
-      id: Date.now().toString(),
-      name: name.trim(),
-      email: email.trim(),
-      subject: subject.trim(),
-      message: message.trim(),
-      createdAt: new Date().toISOString(),
-      read: false,
-      reply: null,
-    };
-    messages.unshift(newMsg);
-    fs.writeFileSync(messagesPath, JSON.stringify(messages, null, 2), "utf-8");
+    // Save message to storage (fail gracefully on serverless)
+    let savedLocally = false;
+    try {
+      const messages = readMessages();
+      const newMsg = {
+        id: Date.now().toString(),
+        name: name.trim(),
+        email: email.trim(),
+        subject: subject.trim(),
+        message: message.trim(),
+        createdAt: new Date().toISOString(),
+        read: false,
+        reply: null,
+      };
+      messages.unshift(newMsg);
+      fs.writeFileSync(messagesPath, JSON.stringify(messages, null, 2), "utf-8");
+      savedLocally = true;
+    } catch (storageErr) {
+      console.error("Failed to save message locally:", storageErr);
+    }
 
     // Try sending email
     const user = process.env.SMTP_USER;
@@ -83,7 +89,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, savedLocally });
   } catch (error) {
     console.error("Contact form error:", error);
     return NextResponse.json(
