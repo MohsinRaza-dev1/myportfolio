@@ -16,12 +16,12 @@ export default function InitialLoader() {
     setProgress(100);
     setTimeout(() => {
       setVisible(false);
-    }, 500);
+    }, 100);
   }, []);
 
   // Smooth progress animation over ~5.5s
   useEffect(() => {
-    const duration = 500; // ms
+    const duration = 2500; // ms
 
     const animate = (timestamp: number) => {
       if (!startTimeRef.current) startTimeRef.current = timestamp;

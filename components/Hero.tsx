@@ -162,7 +162,7 @@ export default function Hero() {
               ) : (
                 <Download size={16} />
               )}
-              {downloadingCv ? "Preparing..." : "Download CV"}
+              {downloadingCv ? "Preparing..." : "Download Resume"}
             </a>
           </motion.div>
 
