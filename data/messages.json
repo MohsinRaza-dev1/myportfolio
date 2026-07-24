@@ -1,1 +1,22 @@
-[]
+[
+  {
+    "id": "1784888538645",
+    "name": "mechnova tech",
+    "email": "mechnovatech1@gmail.com",
+    "subject": "dkf",
+    "message": "adjf",
+    "createdAt": "2026-07-24T10:22:18.645Z",
+    "read": false,
+    "reply": null
+  },
+  {
+    "id": "1784888471623",
+    "name": "Mohsin",
+    "email": "test@example.com",
+    "subject": "Bug test",
+    "message": "Testing if this works",
+    "createdAt": "2026-07-24T10:21:11.623Z",
+    "read": false,
+    "reply": null
+  }
+]
