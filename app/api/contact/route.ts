@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
       email: email.trim(),
       subject: subject.trim(),
       message: message.trim(),
-      created_at: new Date().toISOString(),
+      createdAt: new Date().toISOString(),
       read: false,
       reply: null,
     };
@@ -28,8 +28,7 @@ export async function POST(request: NextRequest) {
     // Try Supabase first
     try {
       const db = getSupabase();
-      const { error: dbError } = await db.from("messages").insert([newMsg]);
-      if (!dbError) newMsg as any;
+      await db.from("messages").insert([{ ...newMsg, created_at: newMsg.createdAt }]);
     } catch {
       // fall through
     }
@@ -57,6 +56,7 @@ export async function POST(request: NextRequest) {
           host: process.env.SMTP_HOST || "smtp.gmail.com",
           port: Number(process.env.SMTP_PORT) || 587,
           secure: false,
+          requireTLS: true,
           auth: { user, pass },
         });
 
