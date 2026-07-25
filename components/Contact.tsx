@@ -65,10 +65,10 @@ export default function Contact() {
   };
 
   return (
-    <AnimatedSection id="contact" className="relative py-16 md:py-24">
+    <AnimatedSection id="contact" className="relative py-24">
       <div className="mx-auto max-w-6xl px-6">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-white md:text-4xl">
+          <h2 className="text-3xl font-bold text-white md:text-4xl">
             Have an idea? Let&apos;s build it together<span className="text-primary-500">.</span>
           </h2>
           <p className="mt-4 text-lg text-dark-400">
@@ -76,7 +76,7 @@ export default function Contact() {
           </p>
         </div>
 
-        <div className="mx-auto mt-10 grid max-w-5xl gap-8 md:gap-10 md:grid-cols-5">
+        <div className="mx-auto mt-12 grid max-w-5xl gap-10 md:grid-cols-5">
           {/* Left - Contact Info */}
           <div className="md:col-span-2">
             <div className="space-y-6">

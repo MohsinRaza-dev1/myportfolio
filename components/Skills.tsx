@@ -21,7 +21,7 @@ export default function Skills() {
   const filteredSkills = skills.filter((s) => s.category === activeCategory);
 
   return (
-    <AnimatedSection id="skills" className="relative py-16 md:py-24">
+    <AnimatedSection id="skills" className="relative py-24">
       <div className="mx-auto max-w-6xl px-6">
         <SectionHeading
           title="Skills & Technologies"

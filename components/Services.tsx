@@ -24,7 +24,7 @@ const iconMap: Record<string, React.ElementType> = {
 
 export default function Services() {
   return (
-    <AnimatedSection id="services" className="relative py-16 md:py-24">
+    <AnimatedSection id="services" className="relative py-24">
       <div className="mx-auto max-w-6xl px-6">
         <SectionHeading
           title="Services"

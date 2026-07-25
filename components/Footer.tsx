@@ -11,7 +11,7 @@ export default function Footer() {
   return (
     <footer className="relative border-t border-dark-800">
       <div className="mx-auto max-w-6xl px-6 py-16">
-        <div className="grid gap-8 md:gap-10 md:grid-cols-4">
+        <div className="grid gap-10 md:grid-cols-4">
           {/* Brand */}
           <div className="md:col-span-2">
             <button
