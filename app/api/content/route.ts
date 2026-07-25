@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSupabase } from "../../../lib/supabase";
+// trigger deploy
 
 export async function GET() {
   // Try Supabase first
