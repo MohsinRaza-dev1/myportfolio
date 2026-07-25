@@ -21,13 +21,7 @@ export async function GET(request: NextRequest) {
   try {
     const db = getSupabase();
     const { data: messages } = await db.from("messages").select("*").order("created_at", { ascending: false });
-    if (messages) {
-      const normalized = messages.map((m: any) => ({
-        ...m,
-        createdAt: m.createdAt || m.created_at,
-      }));
-      return NextResponse.json(normalized);
-    }
+    if (messages) return NextResponse.json(messages);
   } catch {}
 
   // Fallback: local file
