@@ -80,7 +80,7 @@ export default function Hero() {
             transition={{ duration: 0.6 }}
           >
             <span className="inline-block rounded-full border border-primary-500/20 bg-primary-500/10 px-4 py-1.5 text-sm text-primary-400">
-              Software Engineer &amp; AI Developer
+              {profile.shortTitle || "Software Engineer &amp; AI Developer"}
             </span>
           </motion.div>
 

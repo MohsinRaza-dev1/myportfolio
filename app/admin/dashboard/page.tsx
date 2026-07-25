@@ -179,6 +179,7 @@ function ProfileTab({ data, onChange }: { data: ProfileData; onChange: (d: Profi
         <Input label="Name" value={data.name} onChange={set("name")} />
         <Input label="Tagline" value={data.tagline} onChange={set("tagline")} />
         <Input label="Title" value={data.title} onChange={set("title")} />
+        <Input label="Short Title" value={data.shortTitle} onChange={set("shortTitle")} placeholder="e.g. Software Engineer & AI Developer" />
         <Input label="Education" value={data.education} onChange={set("education")} />
         <Input label="Email" value={data.email} onChange={set("email")} />
         <Input label="Phone" value={data.phone} onChange={set("phone")} />

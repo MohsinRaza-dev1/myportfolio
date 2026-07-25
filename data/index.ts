@@ -18,7 +18,7 @@ export const profile = {
   name: "Mohsin Raza",
   title: "Software Engineer | Full Stack AI Developer | Python & FastAPI Developer | Generative AI Engineer",
   shortTitle: "Software Engineer & AI Developer",
-  tagline: "Building Intelligent Digital Solutions with Code and AI.",
+  tagline: "Building Intelligent Digital Solutions w.",
   description:
     "I am a Full Stack AI Developer specializing in Python, FastAPI, modern web applications, Generative AI, LLMs, and intelligent automation. I build scalable applications that solve real-world problems.",
   about:
