@@ -15,7 +15,7 @@ export default function Projects() {
   };
 
   return (
-    <AnimatedSection id="projects" className="relative py-24">
+    <AnimatedSection id="projects" className="relative py-16 md:py-24">
       <div className="mx-auto max-w-6xl px-6">
         <SectionHeading
           title="Featured Projects"

@@ -14,12 +14,12 @@ const highlights = [
 
 export default function About() {
   return (
-    <AnimatedSection id="about" className="relative py-24">
+    <AnimatedSection id="about" className="relative py-16 md:py-24">
       <div className="mx-auto max-w-6xl px-6">
-        <div className="grid gap-16 md:grid-cols-5">
+        <div className="grid gap-10 md:gap-16 md:grid-cols-5">
           {/* Left - Main Content */}
           <div className="md:col-span-3">
-            <h2 className="inline-block text-3xl font-bold text-white md:text-4xl">
+            <h2 className="inline-block text-2xl font-bold text-white md:text-4xl">
               About Me<span className="ml-1 text-primary-500"></span>
             </h2>
             <p className="mt-6 text-base leading-relaxed text-dark-300">
