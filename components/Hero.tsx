@@ -85,7 +85,7 @@ export default function Hero() {
           </motion.div>
 
           <motion.h1
-            className="mt-6 text-4xl font-bold leading-tight text-white md:text-5xl lg:text-6xl"
+            className="mt-6 text-3xl font-bold leading-tight text-white md:text-5xl lg:text-6xl"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
@@ -95,7 +95,7 @@ export default function Hero() {
           </motion.h1>
 
           <motion.p
-            className="mt-2 text-2xl font-semibold text-white md:text-3xl"
+            className="mt-2 text-xl font-semibold text-white md:text-3xl"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
@@ -104,7 +104,7 @@ export default function Hero() {
           </motion.p>
 
           <motion.p
-            className="mt-6 max-w-xl text-base leading-relaxed text-dark-400 md:text-lg"
+            className="mt-4 max-w-xl text-sm leading-relaxed text-dark-400 md:text-lg"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
@@ -113,7 +113,7 @@ export default function Hero() {
           </motion.p>
 
           <motion.div
-            className="mt-8 flex flex-wrap items-center gap-4 justify-center md:justify-start"
+            className="mt-6 flex flex-wrap items-center gap-3 justify-center md:justify-start"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
@@ -182,7 +182,7 @@ export default function Hero() {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8, delay: 0.3 }}
         >
-          <div className="relative h-[250px] w-full md:h-[450px]">
+          <div className="relative h-[200px] w-full md:h-[450px]">
             {/* Glow behind scene */}
             <div className="absolute -inset-10 rounded-full bg-primary-500/10 blur-[100px]" />
             <div className="absolute -inset-20 rounded-full bg-primary-500/5 blur-[120px]" />

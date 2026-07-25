@@ -24,7 +24,7 @@ const iconMap: Record<string, React.ElementType> = {
 
 export default function WhyMe() {
   return (
-    <AnimatedSection id="why-me" className="relative py-24">
+    <AnimatedSection id="why-me" className="relative py-16 md:py-24">
       <div className="mx-auto max-w-6xl px-6">
         <SectionHeading
           title="Why Work With Me"

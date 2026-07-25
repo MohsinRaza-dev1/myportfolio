@@ -6,8 +6,8 @@ interface SectionHeadingProps {
 
 export default function SectionHeading({ title, subtitle, centered = true }: SectionHeadingProps) {
   return (
-    <div className={`mb-16 ${centered ? "text-center" : ""}`}>
-      <h2 className="inline-block text-3xl font-bold text-white md:text-4xl">
+    <div className={`mb-10 md:mb-16 ${centered ? "text-center" : ""}`}>
+      <h2 className="inline-block text-2xl font-bold text-white md:text-4xl">
         {title}
         <span className="ml-1 text-primary-500">.</span>
       </h2>

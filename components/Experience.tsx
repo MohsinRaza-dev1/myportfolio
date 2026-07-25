@@ -6,7 +6,7 @@ import SectionHeading from "@/components/ui/SectionHeading";
 
 export default function Experience() {
   return (
-    <AnimatedSection id="experience" className="relative py-24">
+    <AnimatedSection id="experience" className="relative py-16 md:py-24">
       <div className="mx-auto max-w-6xl px-6">
         <SectionHeading
           title="Experience"
@@ -17,7 +17,7 @@ export default function Experience() {
           {/* Timeline Line */}
           <div className="absolute left-[19px] top-0 h-full w-px bg-dark-800" />
 
-          <div className="space-y-12">
+          <div className="space-y-10 md:space-y-12">
             {experiences.map((exp) => (
               <div key={exp.id} className="relative pl-14">
                 {/* Timeline Dot */}
