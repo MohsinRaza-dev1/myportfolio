@@ -26,11 +26,14 @@ export async function POST(request: NextRequest) {
     };
 
     // Try Supabase first
+    let supabaseSaved = false;
     try {
       const db = getSupabase();
-      await db.from("messages").insert([{ ...newMsg, created_at: newMsg.createdAt }]);
-    } catch {
-      // fall through
+      const { error: insertError } = await db.from("messages").insert([{ ...newMsg, created_at: newMsg.createdAt }]);
+      if (!insertError) supabaseSaved = true;
+      else console.error("Supabase insert error:", insertError);
+    } catch (e) {
+      console.error("Supabase insert exception:", e);
     }
 
     // Fallback: save to local file
