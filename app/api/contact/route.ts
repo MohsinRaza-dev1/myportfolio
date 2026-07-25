@@ -25,13 +25,21 @@ export async function POST(request: NextRequest) {
       reply: null,
     };
 
-    // Try Supabase first
+    // Try Supabase first — only send columns that exist in the table
     let supabaseSaved = false;
     try {
       const db = getSupabase();
-      const { error: insertError } = await db.from("messages").insert([{ ...newMsg, created_at: newMsg.createdAt }]);
+      const { error: insertError } = await db.from("messages").insert([{
+        id: newMsg.id,
+        name: newMsg.name,
+        email: newMsg.email,
+        subject: newMsg.subject,
+        message: newMsg.message,
+        created_at: newMsg.createdAt,
+        read: false,
+        reply: null,
+      }]);
       if (!insertError) supabaseSaved = true;
-      else console.error("Supabase insert error:", insertError);
     } catch (e) {
       console.error("Supabase insert exception:", e);
     }
