@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { ArrowDown, FileText, Download } from "lucide-react";
-import { profile } from "@/data";
+import { profile as staticProfile } from "@/data";
 import { scrollToSection } from "@/lib/utils";
 import SocialLinks from "@/components/ui/SocialLinks";
 import RadialLoader from "@/components/ui/RadialLoader";
@@ -16,8 +16,18 @@ const OrbitalSystem = dynamic(
 );
 
 export default function Hero() {
+  const [profile, setProfile] = useState(staticProfile);
   const [viewingResume, setViewingResume] = useState(false);
   const [downloadingCv, setDownloadingCv] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/content")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data?.profile) setProfile(data.profile);
+      })
+      .catch(() => {}); // fall back to static profile
+  }, []);
 
   const handleViewResume = useCallback(() => {
     setViewingResume(true);
