@@ -16,20 +16,20 @@ export const navItems: NavItem[] = [
 
 export const profile = {
   name: "Mohsin Raza",
-  title: "Software Engineer | Full Stack AI Developer | Python & FastAPI Developer | Generative AI Engineer",
-  shortTitle: "Software Engineer & AI Developer",
-  tagline: "Building Intelligent Digital Solutions w.",
+  title: "Software Engineer | Full Stack  Developer | Generative AI Engineer",
+  shortTitle: "Software Engineer & AI Engineer & Full Stack Developer",
+  tagline: "",
   description:
-    "I am a Full Stack AI Developer specializing in Python, FastAPI, modern web applications, Generative AI, LLMs, and intelligent automation. I build scalable applications that solve real-world problems.",
+    "I am a Software Engineer,Ai Engineer,Full Stack Developer. Building intelligent software systems at the intersection of full-stack engineering and artificial intelligence.",
   about:
-    "I am a Software Engineering student and Full Stack AI Developer passionate about building intelligent software solutions. My work combines modern web development, scalable backend systems, artificial intelligence, and automation. I specialize in backend development, full-stack applications, AI-powered systems, REST APIs, database architecture, Generative AI, and automation.",
+    "I am a Software Engineering,Ai Engineer and Full Stack Developer passionate about building intelligent software solutions. My work combines modern web development, scalable backend systems, artificial intelligence, and automation. I specialize in backend development, full-stack applications, AI-powered systems, REST APIs, database architecture, Generative AI, and automation.",
   email: "hmohsinkhan5@gmail.com",
   phone: "03037327992",
   github: "https://github.com/MohsinRaza-dev1",
   linkedin: "https://www.linkedin.com/in/mohsin-raza-b14447422",
   resumePath: "/resume.pdf",
   profileImage: "/profile.jpg",
-  education: "BS Software Engineering,Ai Engineer ",
+  education: "BS Software Engineering & Ai Engineer ",
 };
 
 // ===== Experience =====
