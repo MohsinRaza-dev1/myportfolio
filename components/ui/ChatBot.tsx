@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Send, Sparkles } from "lucide-react";
+import { profile } from "@/data";
 
 // ─── Types ────────────────────────────────────────────────────────────────
 
@@ -11,7 +12,7 @@ interface Message {
   text: string;
 }
 
-// ─── Suggested questions ──────────────────────────────────────────────────
+// ─── Suggested Questions ──────────────────────────────────────────────────
 
 const SUGGESTIONS = [
   "What skills does Mohsin have?",
@@ -22,10 +23,12 @@ const SUGGESTIONS = [
 
 // ─── Component ────────────────────────────────────────────────────────────
 
+const p = profile as any;
+
 export default function ChatBot() {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
-    { role: "bot", text: `👋 Hi there! I'm Mohsin's AI assistant. Ask me anything about his skills, projects, experience, or services — I know everything about him!` },
+    { role: "bot", text: `👋 Hey there! I'm Mohsin's assistant. Ask me anything about his **skills**, **projects**, **experience**, or **how to contact him** — I know everything!` },
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -70,7 +73,7 @@ export default function ChatBot() {
           ...prev,
           {
             role: "bot",
-            text: "Sorry, I hit a snag. Feel free to email Mohsin directly at hmohsinkhan5@gmail.com!",
+            text: data.reply || "Sorry, I couldn't generate a response. Please try asking differently!",
           },
         ]);
       }
@@ -79,7 +82,7 @@ export default function ChatBot() {
         ...prev,
         {
           role: "bot",
-          text: "Sorry, I couldn't connect. Please try again or reach out via the contact form!",
+          text: "Sorry, I'm having trouble connecting. Please try again, or reach out to Mohsin at **hmohsinkhan5@gmail.com**!",
         },
       ]);
     } finally {
@@ -119,7 +122,6 @@ export default function ChatBot() {
       <AnimatePresence>
         {open && (
           <>
-            {/* Backdrop — only full-screen on mobile */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -129,7 +131,6 @@ export default function ChatBot() {
               onClick={() => setOpen(false)}
             />
 
-            {/* Panel */}
             <motion.div
               initial={{ opacity: 0, y: 20, scale: 0.95, originX: 1, originY: 1 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -196,7 +197,6 @@ export default function ChatBot() {
                   </div>
                 )}
 
-                {/* Suggestions — only show before first user message */}
                 {messages.length === 1 && !loading && (
                   <div className="pt-2">
                     <p className="text-[11px] text-dark-500 mb-2">Try asking:</p>

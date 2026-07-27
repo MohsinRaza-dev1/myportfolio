@@ -16,13 +16,13 @@ export const navItems: NavItem[] = [
 
 export const profile = {
   name: "Mohsin Raza",
-  title: "Software Engineer | Full Stack  Developer | Generative AI Engineer",
-  shortTitle: "Software Engineer & AI Engineer & Full Stack Developer",
+  title: "Full Stack Developer | AI Developer | Python & FastAPI Backend Developer | Generative AI Engineer",
+  shortTitle: "Software Engineer & AI Developer",
   tagline: "",
   description:
-    "I am a Software Engineer,Ai Engineer,Full Stack Developer. Building intelligent software systems at the intersection of full-stack engineering and artificial intelligence.",
+    "I am a Full Stack Developer, AI Developer, and Generative AI Engineer specializing in Python, FastAPI, Next.js, and modern AI technologies. I build intelligent, scalable applications that solve real-world problems.",
   about:
-    "I am a Software Engineering,Ai Engineer and Full Stack Developer passionate about building intelligent software solutions. My work combines modern web development, scalable backend systems, artificial intelligence, and automation. I specialize in backend development, full-stack applications, AI-powered systems, REST APIs, database architecture, Generative AI, and automation.",
+    "I am a Software Engineering student at Gomal University passionate about building intelligent software solutions. My work combines modern web development, scalable backend systems, artificial intelligence, and automation. I specialize in backend development, full-stack applications, AI-powered systems, REST APIs, database architecture, Generative AI, and automation. I am currently maintaining a CGPA of 3.83/4.00.",
   email: "hmohsinkhan5@gmail.com",
   phone: "03037327992",
   whatsapp: "+923037327992",
@@ -30,23 +30,27 @@ export const profile = {
   linkedin: "https://www.linkedin.com/in/mohsin-raza-b14447422",
   resumePath: "/resume.pdf",
   profileImage: "/profile.jpg",
-  education: "BS Software Engineering & Ai Engineer ",
+  education: "BS Software Engineering at Gomal University (2024-2028, CGPA: 3.83/4.00)",
+  university: "Gomal University",
+  degree: "BS Software Engineering",
+  graduationYear: "2028",
+  cgpa: "3.83/4.00",
 };
 
 // ===== Experience =====
 
 export const experiences: Experience[] = [
   {
-    id: "",
-    role: " Seeking For Generative AI Engineer Intern",
-    organization: "",
+    id: "genai-intern-first",
+    role: "Generative AI Engineer Intern",
+    organization: "Faisalabad Institute of Research Sciences and Technology, Akhuwat Campus",
     location: "Faisalabad",
     description:
-      "Working with Generative AI technologies to build AI-powered solutions and intelligent systems.",
+      "Worked as a Generative AI Engineer intern for four months, building AI-powered solutions and intelligent systems.",
     responsibilities: [
-      "Worked with Generative AI technologies to develop intelligent solutions",
-      "Built and deployed AI-powered applications using Large Language Models",
-      "Developed AI question-answering systems using NLP and ML technologies",
+      "Developed AI-powered applications using Large Language Models",
+      "Built AI question-answering systems using NLP and ML technologies",
+      "Worked with Retrieval-Augmented Generation (RAG) systems and vector databases",
       "Explored and implemented NLP and Machine Learning solutions",
       "Built applications using Python and modern AI frameworks",
     ],
@@ -128,12 +132,38 @@ export const projects: Project[] = [
     id: "business-portfolio",
     name: "Business Portfolio Website",
     description:
-      "A modern responsive website designed for businesses and professional branding.",
+      "A modern responsive website designed for businesses and professional branding. This very website was built as a portfolio showcasing Mohsin's skills, projects, experience, and AI capabilities.",
     features: [
       "Responsive design for all devices",
       "Professional business branding",
     ],
     technologies: ["HTML", "CSS", "JavaScript", "React", "Next.js"],
+    github: "https://github.com/MohsinRaza-dev1",
+  },
+  {
+    id: "fastapi-practice",
+    name: "FastAPI Practice APIs",
+    description:
+      "Multiple backend API projects created to improve practical backend development skills with FastAPI.",
+    features: [
+      "REST API development practice",
+      "Database integration with PostgreSQL",
+      "Authentication and authorization patterns",
+    ],
+    technologies: ["Python", "FastAPI", "PostgreSQL", "SQLAlchemy"],
+    github: "https://github.com/MohsinRaza-dev1",
+  },
+  {
+    id: "pser-data",
+    name: "PSER Data Management and Automation",
+    description:
+      "Worked with Punjab Socio-Economic Registry data containing household information such as family members, CNIC details, income, education, employment, housing information, assets, and facilities. Organised, cleaned, and managed the data in Excel and is working towards automating the process using an AI-powered agent.",
+    features: [
+      "Data cleaning and organization",
+      "Excel-based data management",
+      "AI-powered automation pipeline in progress",
+    ],
+    technologies: ["Python", "Excel", "AI Agents", "Automation"],
     github: "https://github.com/MohsinRaza-dev1",
   },
 ];

@@ -1,20 +1,20 @@
 {
   "profile": {
     "name": "Mohsin Raza",
-    "title": "Software Engineer | Full Stack AI Developer | Python & FastAPI Developer | Generative AI Engineer",
+    "title": "Full Stack Developer | AI Developer | Python & FastAPI Backend Developer | Generative AI Engineer",
     "shortTitle": "Software Engineer & AI Developer",
-    "tagline": "hie h ia dk ciadhi f",
-    "description": "I am a Full Stack AI Developer specializing in Python, FastAPI, modern web applications, Generative AI, LLMs, and intelligent automation. I build scalable applications that solve real-world problems.",
-    "about": "I’m a Full-Stack AI Developer and Software Engineering student passionate about building intelligent, scalable, and user-focused digital solutions.\nI specialize in Python, FastAPI, Next.js, TypeScript, PostgreSQL, and Generative AI technologies to create powerful modern applications.\nFrom AI-powered platforms to full-stack systems, I turn innovative ideas into practical, production-ready software.\n",
+    "tagline": "",
+    "description": "I am a Full Stack Developer, AI Developer, and Generative AI Engineer specializing in Python, FastAPI, Next.js, and modern AI technologies. I build intelligent, scalable applications that solve real-world problems.",
+    "about": "I am a Software Engineering student at Gomal University passionate about building intelligent software solutions. My work combines modern web development, scalable backend systems, artificial intelligence, and automation. I specialize in backend development, full-stack applications, AI-powered systems, REST APIs, database architecture, Generative AI, and automation. I am currently maintaining a CGPA of 3.83/4.00.",
     "email": "hmohsinkhan5@gmail.com",
-    "phone": "",
+    "phone": "03037327992",
     "whatsapp": "+923037327992",
     "github": "https://github.com/MohsinRaza-dev1",
     "linkedin": "https://www.linkedin.com/in/mohsin-raza-b14447422",
     "resumePath": "/resume.pdf",
     "profileImage": "/uploads/1784866243555.jpg",
-    "education": "BS Software Engineering, Ai Engineer",
-    "location": "kpk"
+    "education": "BS Software Engineering at Gomal University (2024-2028, CGPA: 3.83/4.00)",
+    "location": "Pakistan"
   },
   "navItems": [
     {
@@ -44,15 +44,15 @@
   ],
   "experiences": [
     {
-      "id": "seeking-intern",
-      "role": "Seeking For Generative AI Engineer Intern",
-      "organization": "",
+      "id": "genai-intern-first",
+      "role": "Generative AI Engineer Intern",
+      "organization": "Faisalabad Institute of Research Sciences and Technology, Akhuwat Campus",
       "location": "Faisalabad",
-      "description": "Working with Generative AI technologies to build AI-powered solutions and intelligent systems.",
+      "description": "Worked as a Generative AI Engineer intern for four months, building AI-powered solutions and intelligent systems.",
       "responsibilities": [
-        "Worked with Generative AI technologies to develop intelligent solutions",
-        "Built and deployed AI-powered applications using Large Language Models",
-        "Developed AI question-answering systems using NLP and ML technologies",
+        "Developed AI-powered applications using Large Language Models",
+        "Built AI question-answering systems using NLP and ML technologies",
+        "Worked with Retrieval-Augmented Generation (RAG) systems and vector databases",
         "Explored and implemented NLP and Machine Learning solutions",
         "Built applications using Python and modern AI frameworks"
       ]
@@ -62,7 +62,7 @@
     {
       "id": "hiremind-ai",
       "name": "HireMind AI",
-      "description": "An AI-powered recruitment SaaS platform designed to improve the hiring process using automation and artificial intelligence.",
+      "description": "A production-oriented AI-powered recruitment SaaS platform with candidate, employer, and admin roles. Includes authentication, profiles, resume uploads, job searching, job posting, AI resume analysis, AI job matching and ranking, interview question generation, and an admin dashboard.",
       "features": [
         "Candidate registration and authentication",
         "Employer accounts and job posting",
@@ -79,9 +79,15 @@
         "Alembic",
         "Pydantic",
         "JWT",
+        "Argon2",
         "Next.js",
         "TypeScript",
         "Tailwind CSS",
+        "shadcn/ui",
+        "React Hook Form",
+        "Zod",
+        "TanStack Query",
+        "Axios",
         "Generative AI"
       ],
       "github": "https://github.com/MohsinRaza-dev1"
@@ -89,13 +95,14 @@
     {
       "id": "school-management",
       "name": "School Management System",
-      "description": "A complete school management platform designed to simplify academic and administrative operations.",
+      "description": "A full-stack school management system using FastAPI backend and Next.js frontend. Includes school management functionality with payment integration concepts such as JazzCash and Easypaisa.",
       "features": [
         "Student and teacher management",
         "Attendance and fee management",
         "Academic records management",
         "Admin dashboard with role-based access control",
-        "Reports and analytics"
+        "Reports and analytics",
+        "JazzCash and Easypaisa payment integration"
       ],
       "technologies": [
         "Python",
@@ -145,7 +152,7 @@
     {
       "id": "business-portfolio",
       "name": "Business Portfolio Website",
-      "description": "A modern responsive website designed for businesses and professional branding.",
+      "description": "A modern responsive website designed for businesses and professional branding. This very website was built as a portfolio showcasing Mohsin's skills, projects, experience, and AI capabilities.",
       "features": [
         "Responsive design for all devices",
         "Professional business branding"
@@ -156,6 +163,40 @@
         "JavaScript",
         "React",
         "Next.js"
+      ],
+      "github": "https://github.com/MohsinRaza-dev1"
+    },
+    {
+      "id": "fastapi-practice",
+      "name": "FastAPI Practice APIs",
+      "description": "Multiple backend API projects created to improve practical backend development skills with FastAPI.",
+      "features": [
+        "REST API development practice",
+        "Database integration with PostgreSQL",
+        "Authentication and authorization patterns"
+      ],
+      "technologies": [
+        "Python",
+        "FastAPI",
+        "PostgreSQL",
+        "SQLAlchemy"
+      ],
+      "github": "https://github.com/MohsinRaza-dev1"
+    },
+    {
+      "id": "pser-data",
+      "name": "PSER Data Management and Automation",
+      "description": "Worked with Punjab Socio-Economic Registry data containing household information such as family members, CNIC details, income, education, employment, housing information, assets, and facilities. Organised, cleaned, and managed the data in Excel and is working towards automating the process using an AI-powered agent.",
+      "features": [
+        "Data cleaning and organization",
+        "Excel-based data management",
+        "AI-powered automation pipeline in progress"
+      ],
+      "technologies": [
+        "Python",
+        "Excel",
+        "AI Agents",
+        "Automation"
       ],
       "github": "https://github.com/MohsinRaza-dev1"
     }
