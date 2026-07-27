@@ -40,8 +40,8 @@ export default function Hero() {
       className="relative flex min-h-screen items-center overflow-hidden"
     >
       {/* Background Grid */}
-      <div className="absolute inset-0 bg-grid" />
-      <div className="absolute inset-0 bg-gradient-radial" />
+      <div className="pointer-events-none absolute inset-0 bg-grid" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-radial" />
 
       {/* Glow Orbs */}
       <div className="pointer-events-none absolute -top-40 right-0 h-[500px] w-[500px] rounded-full bg-primary-500/5 blur-[120px]" />
@@ -166,13 +166,7 @@ export default function Hero() {
             </a>
           </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.5 }}
-          >
-            <SocialLinks className="mt-6 justify-center md:justify-start" />
-          </motion.div>
+          <SocialLinks className="mt-6 justify-center md:justify-start" />
         </div>
 
         {/* Right side - 3D Orbital System */}
@@ -184,8 +178,8 @@ export default function Hero() {
         >
           <div className="relative h-[200px] w-full md:h-[450px]">
             {/* Glow behind scene */}
-            <div className="absolute -inset-10 rounded-full bg-primary-500/10 blur-[100px]" />
-            <div className="absolute -inset-20 rounded-full bg-primary-500/5 blur-[120px]" />
+            <div className="pointer-events-none absolute -inset-10 rounded-full bg-primary-500/10 blur-[100px]" />
+            <div className="pointer-events-none absolute -inset-20 rounded-full bg-primary-500/5 blur-[120px]" />
             <OrbitalSystem
               electronCount={8}
               rotationSpeed={0.8}
