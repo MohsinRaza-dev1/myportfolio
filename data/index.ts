@@ -25,6 +25,7 @@ export const profile = {
     "I am a Software Engineering,Ai Engineer and Full Stack Developer passionate about building intelligent software solutions. My work combines modern web development, scalable backend systems, artificial intelligence, and automation. I specialize in backend development, full-stack applications, AI-powered systems, REST APIs, database architecture, Generative AI, and automation.",
   email: "hmohsinkhan5@gmail.com",
   phone: "03037327992",
+  whatsapp: "+923037327992",
   github: "https://github.com/MohsinRaza-dev1",
   linkedin: "https://www.linkedin.com/in/mohsin-raza-b14447422",
   resumePath: "/resume.pdf",

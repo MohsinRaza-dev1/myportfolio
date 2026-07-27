@@ -14,6 +14,7 @@ export interface ProfileData {
   about: string;
   email: string;
   phone: string;
+  whatsapp: string;
   github: string;
   linkedin: string;
   resumePath: string;
@@ -55,6 +56,7 @@ const defaultContent: SiteContent = {
     about: "",
     email: "",
     phone: "",
+    whatsapp: "",
     github: "",
     linkedin: "",
     resumePath: "",

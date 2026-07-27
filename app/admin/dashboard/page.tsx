@@ -183,6 +183,7 @@ function ProfileTab({ data, onChange }: { data: ProfileData; onChange: (d: Profi
         <Input label="Education" value={data.education} onChange={set("education")} />
         <Input label="Email" value={data.email} onChange={set("email")} />
         <Input label="Phone" value={data.phone} onChange={set("phone")} />
+        <Input label="WhatsApp Number" value={data.whatsapp} onChange={set("whatsapp")} placeholder="e.g. +923037327992" />
         <Input label="GitHub URL" value={data.github} onChange={set("github")} />
         <Input label="LinkedIn URL" value={data.linkedin} onChange={set("linkedin")} />
         <Input label="Resume File Path" value={data.resumePath} onChange={set("resumePath")} />
