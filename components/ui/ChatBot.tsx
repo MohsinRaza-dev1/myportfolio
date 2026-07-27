@@ -28,10 +28,11 @@ const p = profile as any;
 export default function ChatBot() {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
-    { role: "bot", text: `👋 Hey there! I'm Mohsin's assistant. Ask me anything about his **skills**, **projects**, **experience**, or **how to contact him** — I know everything!` },
+    { role: "bot", text: `👋 Hey there! I'm Mohsin's AI assistant. Ask me anything about his **skills**, **projects**, **experience**, or **how to contact him** — I know everything!` },
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [sessionId] = useState(() => `anon_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -60,7 +61,7 @@ export default function ChatBot() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           message: msg,
-          history: messages.map((m) => ({ role: m.role, text: m.text })),
+          sessionId,
         }),
       });
 

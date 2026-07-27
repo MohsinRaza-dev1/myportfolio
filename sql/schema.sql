@@ -32,3 +32,14 @@ CREATE TABLE IF NOT EXISTS admin_settings (
 INSERT INTO admin_settings (id, password)
 VALUES (1, 'admin123')
 ON CONFLICT (id) DO NOTHING;
+
+-- Chat conversations table
+CREATE TABLE IF NOT EXISTS chat_conversations (
+  session_id TEXT NOT NULL,
+  role TEXT NOT NULL CHECK (role IN ('user', 'bot')),
+  message TEXT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_chat_conversations_session
+  ON chat_conversations (session_id, created_at);

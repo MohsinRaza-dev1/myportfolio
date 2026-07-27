@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getSupabase } from "../../../lib/supabase";
 
 const SYSTEM_INSTRUCTION = `You are a friendly, professional AI assistant for Mohsin Raza's portfolio website. Your job is to answer questions about Mohsin — his background, skills, experience, projects, education, and services.
 
@@ -96,13 +97,54 @@ Technologies: Python, Excel, AI Agents, Automation.
 - The assistant should not claim to be Mohsin himself unless the user clearly asks for a first-person portfolio response. Default to third person ("Mohsin is...", "he specializes in...").
 - For questions unrelated to the portfolio, the assistant may answer briefly, but should redirect the conversation towards Mohsin's skills, projects, experience, and portfolio.`;
 
+async function saveMessage(sessionId: string, role: string, message: string) {
+  try {
+    const db = getSupabase();
+    await db.from("chat_conversations").insert({
+      session_id: sessionId,
+      role,
+      message,
+      created_at: new Date().toISOString(),
+    });
+  } catch (e) {
+    // Supabase not configured — silently ignore
+  }
+}
+
+async function loadHistory(sessionId: string): Promise<{ role: string; text: string }[]> {
+  try {
+    const db = getSupabase();
+    const { data } = await db
+      .from("chat_conversations")
+      .select("role, message")
+      .eq("session_id", sessionId)
+      .order("created_at", { ascending: true })
+      .limit(20);
+
+    if (data) {
+      return data.map((row: any) => ({ role: row.role, text: row.message }));
+    }
+  } catch {
+    // Supabase not configured
+  }
+  return [];
+}
+
 export async function POST(request: NextRequest) {
   try {
-    const { message, history } = await request.json();
+    const { message, sessionId } = await request.json();
 
     if (!message?.trim()) {
       return NextResponse.json({ error: "Message is required" }, { status: 400 });
     }
+
+    const sid = sessionId || `anon_${Date.now()}`;
+
+    // Save user message to Supabase
+    await saveMessage(sid, "user", message.trim());
+
+    // Load conversation history from Supabase
+    const history = await loadHistory(sid);
 
     const apiKey = process.env.GEMINI_API_KEY;
 
@@ -112,22 +154,20 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Build conversation history
+    // Build conversation contents
     const contents: { role: string; parts: { text: string }[] }[] = [];
 
-    if (history && history.length > 0) {
-      for (const msg of history) {
-        contents.push({
-          role: msg.role === "user" ? "user" : "model",
-          parts: [{ text: msg.text }],
-        });
-      }
+    for (const msg of history) {
+      contents.push({
+        role: msg.role === "user" ? "user" : "model",
+        parts: [{ text: msg.text }],
+      });
     }
 
-    // Add current user message
+    // Add the current message
     contents.push({
       role: "user",
-      parts: [{ text: message }],
+      parts: [{ text: message.trim() }],
     });
 
     const res = await fetch(
@@ -153,35 +193,36 @@ export async function POST(request: NextRequest) {
       const errText = await res.text();
       console.error("Gemini API error:", res.status, errText);
 
-      // Check for specific error types
       if (res.status === 403 || res.status === 401) {
-        return NextResponse.json({
-          reply: "I'm sorry, the AI service is not properly configured. Please reach out to Mohsin directly at **hmohsinkhan5@gmail.com**!",
-        });
+        const fallback = "I'm sorry, the AI service is not properly configured. Please reach out to Mohsin directly at **hmohsinkhan5@gmail.com**!";
+        await saveMessage(sid, "bot", fallback);
+        return NextResponse.json({ reply: fallback });
       }
 
       if (res.status === 429) {
-        return NextResponse.json({
-          reply: "I'm getting too many requests right now! Please try again in a moment, or reach out to Mohsin at **hmohsinkhan5@gmail.com**.",
-        });
+        const fallback = "I'm getting too many requests right now! Please try again in a moment, or reach out to Mohsin at **hmohsinkhan5@gmail.com**.";
+        await saveMessage(sid, "bot", fallback);
+        return NextResponse.json({ reply: fallback });
       }
 
-      return NextResponse.json({
-        reply: "I'm experiencing a temporary issue. Please try again shortly, or contact Mohsin at **hmohsinkhan5@gmail.com**!",
-      });
+      const fallback = "I'm experiencing a temporary issue. Please try again shortly, or contact Mohsin at **hmohsinkhan5@gmail.com**!";
+      await saveMessage(sid, "bot", fallback);
+      return NextResponse.json({ reply: fallback });
     }
 
     const data = await res.json();
-    const reply =
-      data.candidates?.[0]?.content?.parts?.[0]?.text;
+    const reply = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
     if (!reply) {
-      return NextResponse.json({
-        reply: "I couldn't generate a response. Please try asking your question differently!",
-      });
+      const fallback = "I couldn't generate a response. Please try asking your question differently!";
+      await saveMessage(sid, "bot", fallback);
+      return NextResponse.json({ reply: fallback });
     }
 
-    return NextResponse.json({ reply });
+    // Save bot response to Supabase
+    await saveMessage(sid, "bot", reply);
+
+    return NextResponse.json({ reply, sessionId: sid });
   } catch (error) {
     console.error("Chat API error:", error);
     return NextResponse.json({
