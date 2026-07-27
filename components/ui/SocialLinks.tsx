@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { Github, Linkedin, Mail, Phone } from "lucide-react";
 
 interface SocialLinksProps {
@@ -27,18 +26,16 @@ export default function SocialLinks({ className = "", iconSize = 20, exclude = [
         const item = socialConfig[key];
         const Icon = item.icon;
         return (
-          <motion.a
+          <a
             key={key}
             href={item.url}
             target={key !== "email" && key !== "phone" ? "_blank" : undefined}
             rel="noopener noreferrer"
             aria-label={item.label}
-            className="flex h-10 w-10 items-center justify-center rounded-lg border border-dark-700 text-dark-400 transition-colors hover:border-primary-500/50 hover:text-primary-400"
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
+            className="flex h-10 w-10 items-center justify-center rounded-lg border border-dark-700 text-dark-400 transition-all hover:scale-110 hover:border-primary-500/50 hover:text-primary-400 active:scale-95"
           >
             <Icon size={iconSize} />
-          </motion.a>
+          </a>
         );
       })}
     </div>
