@@ -729,6 +729,12 @@ export default function AdminDashboard() {
       if (res.ok) {
         setSaved(true);
         setTimeout(() => setSaved(false), 2500);
+        // Re-fetch to confirm save and sync state
+        const fresh = await fetch(`/api/content?t=${Date.now()}`);
+        if (fresh.ok) {
+          const freshData = await fresh.json();
+          setContent(freshData);
+        }
       }
     } catch { /* ignore */ }
     setSaving(false);

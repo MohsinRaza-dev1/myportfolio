@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSupabase } from "../../../lib/supabase";
-// trigger deploy
+
+export const dynamic = "force-dynamic";
 
 export async function GET() {
   // Try Supabase first
@@ -12,11 +13,17 @@ export async function GET() {
       .eq("id", 1)
       .single();
 
-    if (!error && data) {
-      return NextResponse.json(data.data);
+    if (error) {
+      console.error("Supabase read error:", error.message);
     }
-  } catch {
-    // fall through
+
+    if (!error && data) {
+      return NextResponse.json(data.data, {
+        headers: { "Cache-Control": "no-store, no-cache, must-revalidate" },
+      });
+    }
+  } catch (e) {
+    console.error("Supabase read exception:", e);
   }
 
   // Fallback: read from local file
@@ -25,7 +32,9 @@ export async function GET() {
     const path = await import("path");
     const contentPath = path.join(process.cwd(), "data", "content.json");
     const raw = fs.readFileSync(contentPath, "utf-8");
-    return NextResponse.json(JSON.parse(raw));
+    return NextResponse.json(JSON.parse(raw), {
+      headers: { "Cache-Control": "no-store, no-cache, must-revalidate" },
+    });
   } catch {
     return NextResponse.json({ error: "Failed to read content" }, { status: 500 });
   }

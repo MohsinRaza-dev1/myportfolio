@@ -92,7 +92,7 @@ export function ContentProvider({ children }: { children: ReactNode }) {
 
   const fetchContent = async () => {
     try {
-      const res = await fetch("/api/content");
+      const res = await fetch(`/api/content?t=${Date.now()}`);
       if (res.ok) {
         const data = await res.json();
         setContent((prev) => ({ ...prev, ...data }));
