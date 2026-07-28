@@ -23,24 +23,28 @@ export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
 
-    // Always write to local file first (reliable fallback)
+    // Write to local file (best-effort, useful for local dev)
     try {
       const fs = await import("fs");
       const path = await import("path");
       fs.writeFileSync(path.join(process.cwd(), "data", "content.json"), JSON.stringify(body, null, 2), "utf-8");
-    } catch (e) {
-      console.error("Local file write failed:", e);
+    } catch {
+      // No-op: on Vercel the filesystem is read-only, not critical
     }
 
-    // Also write to Supabase
+    // Write to Supabase — this is the source of truth on the live server
     try {
       const db = getSupabase();
       const { error } = await db.from("site_content").upsert({
         id: 1, data: body, updated_at: new Date().toISOString(),
       });
-      if (error) console.error("Supabase write error:", error.message);
+      if (error) {
+        console.error("Supabase write error:", error.message);
+        return NextResponse.json({ error: "Failed to save to database" }, { status: 500 });
+      }
     } catch (e) {
       console.error("Supabase write exception:", e);
+      return NextResponse.json({ error: "Database connection failed" }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });

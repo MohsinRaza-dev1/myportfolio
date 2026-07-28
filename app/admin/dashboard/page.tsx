@@ -717,9 +717,12 @@ export default function AdminDashboard() {
       .catch(() => setLoading(false));
   }, []);
 
+  const [saveError, setSaveError] = useState("");
+
   const handleSave = async () => {
     if (!content) return;
     setSaving(true);
+    setSaveError("");
     try {
       const res = await fetch("/api/admin/content", {
         method: "PUT",
@@ -735,8 +738,13 @@ export default function AdminDashboard() {
           const freshData = await fresh.json();
           setContent(freshData);
         }
+      } else {
+        const err = await res.json();
+        setSaveError(err.error || "Save failed");
       }
-    } catch { /* ignore */ }
+    } catch {
+      setSaveError("Connection error. Please try again.");
+    }
     setSaving(false);
   };
 
@@ -773,6 +781,9 @@ export default function AdminDashboard() {
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
           <h1 className="text-lg font-bold text-white">Admin Panel</h1>
           <div className="flex items-center gap-3">
+            {saveError && (
+              <span className="text-sm text-red-400">{saveError}</span>
+            )}
             <button
               onClick={handleSave}
               disabled={saving}
@@ -860,7 +871,10 @@ export default function AdminDashboard() {
 
             {/* Bottom save (only for content tabs) */}
             {activeTab !== "messages" && activeTab !== "settings" && (
-              <div className="mt-6 flex justify-end">
+              <div className="mt-6 flex justify-end items-center gap-3">
+                {saveError && (
+                  <span className="text-sm text-red-400">{saveError}</span>
+                )}
                 <button
                   onClick={handleSave}
                   disabled={saving}
