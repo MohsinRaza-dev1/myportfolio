@@ -9,7 +9,7 @@ import {
   Database,
   Zap,
 } from "lucide-react";
-import { services } from "@/data";
+import { useContent } from "@/lib/content-context";
 import AnimatedSection from "@/components/AnimatedSection";
 import SectionHeading from "@/components/ui/SectionHeading";
 
@@ -23,6 +23,8 @@ const iconMap: Record<string, React.ElementType> = {
 };
 
 export default function Services() {
+  const { content } = useContent();
+  const services = content.services;
   return (
     <AnimatedSection id="services" className="relative py-16 md:py-24">
       <div className="mx-auto max-w-6xl px-6">

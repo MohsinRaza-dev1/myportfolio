@@ -1,7 +1,7 @@
 "use client";
 
 import { Github, Linkedin, Mail, Phone } from "lucide-react";
-import { profile } from "@/data";
+import { useContent } from "@/lib/content-context";
 
 interface SocialLinksProps {
   className?: string;
@@ -23,28 +23,27 @@ function WhatsAppIcon({ size }: { size: number }) {
   );
 }
 
-function makeWhatsappUrl(): string {
-  const phone = (profile.whatsapp || "").replace(/[^0-9]/g, "");
-  return `https://wa.me/${phone}`;
-}
-
-const socialConfig: Record<string, { icon: React.ElementType; url: string; label: string }> = {
-  github: { icon: Github, url: "https://github.com/MohsinRaza-dev1", label: "GitHub" },
-  linkedin: { icon: Linkedin, url: "https://www.linkedin.com/in/mohsin-raza-b14447422", label: "LinkedIn" },
-  email: { icon: Mail, url: "mailto:hmohsinkhan5@gmail.com", label: "Email" },
-  phone: { icon: Phone, url: "tel:03037327992", label: "Phone" },
+const iconMap: Record<string, React.ElementType> = {
+  github: Github,
+  linkedin: Linkedin,
+  email: Mail,
+  phone: Phone,
 };
 
-const order = ["github", "linkedin", "email", "phone"];
-
 export default function SocialLinks({ className = "", iconSize = 20, exclude = [] }: SocialLinksProps) {
-  const links = order.filter((key) => !exclude.includes(key));
+  const { content } = useContent();
+  const profile = content.profile;
+  const socialLinks = content.socialLinks || {};
+
+  const order = ["github", "linkedin", "email", "phone"];
+  const links = order.filter((key) => !exclude.includes(key) && socialLinks[key]);
 
   return (
     <div className={`flex items-center gap-3 ${className}`}>
       {links.map((key) => {
-        const item = socialConfig[key];
-        const Icon = item.icon;
+        const item = socialLinks[key];
+        const Icon = iconMap[key];
+        if (!Icon || !item) return null;
         return (
           <a
             key={key}
@@ -58,9 +57,9 @@ export default function SocialLinks({ className = "", iconSize = 20, exclude = [
           </a>
         );
       })}
-      {profile.whatsapp && !exclude.includes("whatsapp") && (
+      {socialLinks.whatsapp && !exclude.includes("whatsapp") && (
         <a
-          href={makeWhatsappUrl()}
+          href={socialLinks.whatsapp.url}
           target="_blank"
           rel="noopener noreferrer"
           aria-label="WhatsApp"

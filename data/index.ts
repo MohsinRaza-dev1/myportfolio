@@ -31,6 +31,7 @@ export const profile = {
   resumePath: "/resume.pdf",
   profileImage: "/profile.jpg",
   education: "BS Software Engineering at Gomal University (2024-2028, CGPA: 3.83/4.00)",
+  location: "Pakistan",
   university: "Gomal University",
   degree: "BS Software Engineering",
   graduationYear: "2028",

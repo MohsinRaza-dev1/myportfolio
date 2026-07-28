@@ -4,6 +4,16 @@ import { createContext, useContext, useState, useEffect, type ReactNode } from "
 import type {
   Project, Experience, Skill, SkillCategory, Service, NavItem,
 } from "@/types";
+import {
+  profile as staticProfile,
+  navItems as staticNavItems,
+  experiences as staticExperiences,
+  projects as staticProjects,
+  skills as staticSkills,
+  skillCategories as staticSkillCategories,
+  services as staticServices,
+  whyMe as staticWhyMe,
+} from "@/data";
 
 export interface ProfileData {
   name: string;
@@ -47,31 +57,21 @@ export interface SiteContent {
 }
 
 const defaultContent: SiteContent = {
-  profile: {
-    name: "",
-    title: "",
-    shortTitle: "",
-    tagline: "",
-    description: "",
-    about: "",
-    email: "",
-    phone: "",
-    whatsapp: "",
-    github: "",
-    linkedin: "",
-    resumePath: "",
-    profileImage: "",
-    education: "",
-    location: "",
+  profile: staticProfile,
+  navItems: staticNavItems,
+  experiences: staticExperiences,
+  projects: staticProjects,
+  skills: staticSkills,
+  skillCategories: staticSkillCategories,
+  services: staticServices,
+  whyMe: staticWhyMe,
+  socialLinks: {
+    github: { label: "GitHub", url: staticProfile.github },
+    linkedin: { label: "LinkedIn", url: staticProfile.linkedin },
+    email: { label: "Email", url: `mailto:${staticProfile.email}` },
+    phone: { label: "Phone", url: `tel:${staticProfile.phone}` },
+    ...(staticProfile.whatsapp ? { whatsapp: { label: "WhatsApp", url: `https://wa.me/${staticProfile.whatsapp.replace(/[^0-9]/g, "")}` } } : {}),
   },
-  navItems: [],
-  experiences: [],
-  projects: [],
-  skills: [],
-  skillCategories: [],
-  services: [],
-  whyMe: [],
-  socialLinks: {},
 };
 
 interface ContentContextValue {
@@ -95,7 +95,7 @@ export function ContentProvider({ children }: { children: ReactNode }) {
       const res = await fetch("/api/content");
       if (res.ok) {
         const data = await res.json();
-        setContent(data);
+        setContent((prev) => ({ ...prev, ...data }));
       }
     } catch {
       // Fallback — content stays as-is

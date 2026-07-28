@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Send, Sparkles } from "lucide-react";
-import { profile } from "@/data";
+import { useContent } from "@/lib/content-context";
 
 // ─── Types ────────────────────────────────────────────────────────────────
 
@@ -23,9 +23,8 @@ const SUGGESTIONS = [
 
 // ─── Component ────────────────────────────────────────────────────────────
 
-const p = profile as any;
-
 export default function ChatBot() {
+  const { content } = useContent();
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     { role: "bot", text: `👋 Hey there! I'm Mohsin's AI assistant. Ask me anything about his **skills**, **projects**, **experience**, or **how to contact him** — I know everything!` },
@@ -83,7 +82,7 @@ export default function ChatBot() {
         ...prev,
         {
           role: "bot",
-          text: "Sorry, I'm having trouble connecting. Please try again, or reach out to Mohsin at **hmohsinkhan5@gmail.com**!",
+          text: "Sorry, I'm having trouble connecting. Please try again, or reach out to Mohsin directly!",
         },
       ]);
     } finally {

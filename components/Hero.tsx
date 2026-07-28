@@ -4,7 +4,7 @@ import { useState, useCallback } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { ArrowDown, FileText, Download } from "lucide-react";
-import { profile } from "@/data";
+import { useContent } from "@/lib/content-context";
 import { scrollToSection } from "@/lib/utils";
 import SocialLinks from "@/components/ui/SocialLinks";
 import RadialLoader from "@/components/ui/RadialLoader";
@@ -16,6 +16,8 @@ const OrbitalSystem = dynamic(
 );
 
 export default function Hero() {
+  const { content } = useContent();
+  const profile = content.profile;
   const [viewingResume, setViewingResume] = useState(false);
   const [downloadingCv, setDownloadingCv] = useState(false);
 

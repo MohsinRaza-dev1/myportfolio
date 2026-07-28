@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { skills, skillCategories } from "@/data";
+import { useContent } from "@/lib/content-context";
 import type { SkillCategory } from "@/types";
 import AnimatedSection from "@/components/AnimatedSection";
 import SectionHeading from "@/components/ui/SectionHeading";
@@ -16,6 +16,9 @@ const categoryIcons: Record<string, string> = {
 };
 
 export default function Skills() {
+  const { content } = useContent();
+  const skills = content.skills;
+  const skillCategories = content.skillCategories;
   const [activeCategory, setActiveCategory] = useState<SkillCategory>("Backend");
 
   const filteredSkills = skills.filter((s) => s.category === activeCategory);

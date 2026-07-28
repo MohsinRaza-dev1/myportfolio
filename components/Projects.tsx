@@ -3,11 +3,13 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ExternalLink, Github, ChevronDown } from "lucide-react";
-import { projects } from "@/data";
+import { useContent } from "@/lib/content-context";
 import AnimatedSection from "@/components/AnimatedSection";
 import SectionHeading from "@/components/ui/SectionHeading";
 
 export default function Projects() {
+  const { content } = useContent();
+  const projects = content.projects;
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const toggleExpand = (id: string) => {

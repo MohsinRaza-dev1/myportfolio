@@ -9,7 +9,7 @@ import {
   BookOpen,
   MessageSquare,
 } from "lucide-react";
-import { whyMe } from "@/data";
+import { useContent } from "@/lib/content-context";
 import AnimatedSection from "@/components/AnimatedSection";
 import SectionHeading from "@/components/ui/SectionHeading";
 
@@ -23,6 +23,8 @@ const iconMap: Record<string, React.ElementType> = {
 };
 
 export default function WhyMe() {
+  const { content } = useContent();
+  const whyMe = content.whyMe;
   return (
     <AnimatedSection id="why-me" className="relative py-16 md:py-24">
       <div className="mx-auto max-w-6xl px-6">

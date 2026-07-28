@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Code2, Cpu, Database, Globe, Layers } from "lucide-react";
-import { profile } from "@/data";
+import { useContent } from "@/lib/content-context";
 import AnimatedSection from "@/components/AnimatedSection";
 
 const highlights = [
@@ -13,6 +13,8 @@ const highlights = [
 ];
 
 export default function About() {
+  const { content } = useContent();
+  const profile = content.profile;
   return (
     <AnimatedSection id="about" className="relative py-16 md:py-24">
       <div className="mx-auto max-w-6xl px-6">

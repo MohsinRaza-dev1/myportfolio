@@ -1,11 +1,13 @@
 "use client";
 
 import { Github, Linkedin, Mail, Phone, ArrowUp } from "lucide-react";
-import { profile } from "@/data";
+import { useContent } from "@/lib/content-context";
 import { scrollToSection } from "@/lib/utils";
-import { navItems } from "@/data";
 
 export default function Footer() {
+  const { content } = useContent();
+  const profile = content.profile;
+  const navItems = content.navItems;
   const currentYear = new Date().getFullYear();
 
   return (

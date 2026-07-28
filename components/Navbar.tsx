@@ -3,12 +3,14 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
-import { navItems } from "@/data";
+import { useContent } from "@/lib/content-context";
 import { scrollToSection } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import RadialLoader from "@/components/ui/RadialLoader";
 
 export default function Navbar() {
+  const { content } = useContent();
+  const navItems = content.navItems;
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("home");

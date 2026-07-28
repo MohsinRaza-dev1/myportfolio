@@ -3,12 +3,14 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Send, CheckCircle, AlertCircle, Mail, MapPin } from "lucide-react";
-import { profile } from "@/data";
+import { useContent } from "@/lib/content-context";
 import AnimatedSection from "@/components/AnimatedSection";
 import SocialLinks from "@/components/ui/SocialLinks";
 import RadialLoader from "@/components/ui/RadialLoader";
 
 export default function Contact() {
+  const { content } = useContent();
+  const profile = content.profile;
   const [formState, setFormState] = useState({
     name: "",
     email: "",

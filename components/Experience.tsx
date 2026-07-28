@@ -1,10 +1,12 @@
 "use client";
 
-import { experiences } from "@/data";
+import { useContent } from "@/lib/content-context";
 import AnimatedSection from "@/components/AnimatedSection";
 import SectionHeading from "@/components/ui/SectionHeading";
 
 export default function Experience() {
+  const { content } = useContent();
+  const experiences = content.experiences;
   return (
     <AnimatedSection id="experience" className="relative py-16 md:py-24">
       <div className="mx-auto max-w-6xl px-6">
