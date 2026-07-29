@@ -17,7 +17,7 @@ export const navItems: NavItem[] = [
 export const profile = {
   name: "Mohsin Raza",
   title: "Full Stack Developer | AI Developer | Python & FastAPI Backend Developer | Generative AI Engineer",
-  shortTitle: "Software Engineer & AI Developer",
+  shortTitle: "Software Engineer & AI Engineer",
   tagline: "",
   description:
     "I am a Full Stack Developer, AI Developer, and Generative AI Engineer specializing in Python, FastAPI, Next.js, and modern AI technologies. I build intelligent, scalable applications that solve real-world problems.",
@@ -30,30 +30,33 @@ export const profile = {
   linkedin: "https://www.linkedin.com/in/mohsin-raza-b14447422",
   resumePath: "/resume.pdf",
   profileImage: "/profile.jpg",
-  education: "BS Software Engineering at Gomal University (2024-2028, CGPA: 3.83/4.00)",
+  education: "BS Software Engineering at Gomal University (2024-2028)",
   location: "Pakistan",
   university: "Gomal University",
-  degree: "BS Software Engineering",
+  degree: "BS Software Engineering,Gen Ai ",
   graduationYear: "2028",
-  cgpa: "3.83/4.00",
+  cgpa: "",
 };
 
 // ===== Experience =====
 
 export const experiences: Experience[] = [
   {
-    id: "genai-intern-first",
-    role: "Generative AI Engineer Intern",
-    organization: "Faisalabad Institute of Research Sciences and Technology, Akhuwat Campus",
+    id: "Hands-on Experience",
+    role: "Generative AI Engineer",
+    organization: "",
     location: "Faisalabad",
     description:
-      "Worked as a Generative AI Engineer intern for four months, building AI-powered solutions and intelligent systems.",
+      "Gainded hands-on experince as a Generative AI Engineer course for four months, building AI-powered solutions and intelligent systems.",
     responsibilities: [
-      "Developed AI-powered applications using Large Language Models",
+      "Built full-stack web applications using Python, FastAPI, Next.js, React, TypeScript, and PostgreSQL.",
       "Built AI question-answering systems using NLP and ML technologies",
+      "Developed AI-powered applications using LangChain, LLMs, and Generative AI.",
       "Worked with Retrieval-Augmented Generation (RAG) systems and vector databases",
       "Explored and implemented NLP and Machine Learning solutions",
       "Built applications using Python and modern AI frameworks",
+      "Deployed applications using Vercel and cloud platforms",
+      "Used Git and GitHub for version control and collaborative development",
     ],
   },
 ];
