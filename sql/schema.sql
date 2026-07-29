@@ -12,26 +12,23 @@ CREATE TABLE IF NOT EXISTS messages (
   reply TEXT
 );
 
--- Site content (single row storing full JSON blob)
-CREATE TABLE IF NOT EXISTS site_content (
-  id INTEGER PRIMARY KEY DEFAULT 1,
-  data JSONB NOT NULL,
-  updated_at TIMESTAMPTZ DEFAULT NOW(),
-  CONSTRAINT single_row CHECK (id = 1)
-);
-
--- Admin settings (password, etc)
+-- Admin settings (password, etc) - single row only
 CREATE TABLE IF NOT EXISTS admin_settings (
   id INTEGER PRIMARY KEY DEFAULT 1,
-  password TEXT NOT NULL DEFAULT 'admin123',
-  updated_at TIMESTAMPTZ DEFAULT NOW(),
-  CONSTRAINT single_row CHECK (id = 1)
+  password TEXT DEFAULT 'admin123'
 );
 
 -- Insert default admin password row
 INSERT INTO admin_settings (id, password)
 VALUES (1, 'admin123')
 ON CONFLICT (id) DO NOTHING;
+
+-- Site content (single row storing full JSON blob)
+CREATE TABLE IF NOT EXISTS site_content (
+  id INTEGER PRIMARY KEY DEFAULT 1,
+  data JSONB,
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
 
 -- Chat conversations table
 CREATE TABLE IF NOT EXISTS chat_conversations (
