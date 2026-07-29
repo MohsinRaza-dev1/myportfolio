@@ -23,6 +23,11 @@ export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
 
+    // Validate: body must have at least a profile
+    if (!body || typeof body !== "object" || !body.profile) {
+      return NextResponse.json({ error: "Invalid content structure — profile is required" }, { status: 400 });
+    }
+
     // Write to local file (best-effort, useful for local dev)
     try {
       const fs = await import("fs");
