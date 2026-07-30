@@ -170,7 +170,7 @@ function ImageUploader({ current, onUpload, label }: {
         >
           <Upload size={16} /> {uploading ? "Uploading..." : "Upload"}
         </button>
-        <span className="text-xs text-dark-500">{current || "No image"}</span>
+        <span className="text-xs text-dark-500 truncate max-w-[200px]">{current ? (current.startsWith("data:") ? "Base64 image" : current.split("/").pop()) : "No image"}</span>
       </div>
     </div>
   );
