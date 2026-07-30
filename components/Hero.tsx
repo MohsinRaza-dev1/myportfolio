@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import Image from "next/image";
 import { motion } from "framer-motion";
 import { ArrowDown, FileText, Download } from "lucide-react";
 import { useContent } from "@/lib/content-context";
@@ -64,13 +63,10 @@ export default function Hero() {
               <div className="absolute inset-0 rounded-full bg-primary-500/20 blur-2xl" />
               {/* Circular image */}
               <div className="relative h-40 w-40 overflow-hidden rounded-full border-2 border-primary-500/30 md:h-52 md:w-52">
-                <Image
+                <img
                   src={profile.profileImage}
                   alt={profile.name}
-                  width={208}
-                  height={208}
                   className="h-full w-full object-cover object-top"
-                  priority
                 />
               </div>
             </div>
