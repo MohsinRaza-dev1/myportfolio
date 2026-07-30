@@ -40,14 +40,16 @@ export async function PUT(request: NextRequest) {
     }
 
     // Try Supabase first
+    let supabaseUpdated = false;
     try {
       const db = getSupabase();
-      const { error } = await db.from("admin_settings").update({
-        password: newPassword,
-        updated_at: new Date().toISOString(),
-      }).eq("id", 1);
+      const { error } = await db.from("admin_settings").upsert({
+        id: 1, password: newPassword,
+      }, { onConflict: "id" });
       if (error) throw error;
-    } catch {
+      supabaseUpdated = true;
+    } catch (e) {
+      console.error("Supabase password update failed:", e);
       // Fallback: update .env.local (works locally)
       try {
         const fs = await import("fs");
@@ -61,10 +63,14 @@ export async function PUT(request: NextRequest) {
           envContent += `\nADMIN_PASSWORD=${newPassword}\n`;
         }
         fs.writeFileSync(envPath, envContent, "utf-8");
-      } catch {
+      } catch (fsErr) {
+        console.error("File fallback password update failed:", fsErr);
         return NextResponse.json({ error: "Failed to update password" }, { status: 500 });
       }
     }
+
+    // Sync the env var so in-process auth checks work immediately
+    process.env.ADMIN_PASSWORD = newPassword;
 
     return NextResponse.json({ success: true });
   } catch {
