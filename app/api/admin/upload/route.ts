@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     const ext = file.name.split(".").pop() || "jpg";
     const fileName = `${Date.now()}.${ext}`;
 
-    // Try Supabase Storage first
+    // Try Supabase Storage first (with timeout)
     try {
       const db = getSupabase();
       const { error: uploadError } = await db.storage.from("uploads").upload(fileName, buffer, {
@@ -39,22 +39,13 @@ export async function POST(request: NextRequest) {
       }
     } catch {}
 
-    // Create the uploads bucket if it doesn't exist, then retry
+    // Try raw Supabase REST upload (with timeout via AbortController)
     try {
       const supabaseUrl = process.env.SUPABASE_URL;
       const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
       if (supabaseUrl && supabaseKey) {
-        // Try creating bucket first
-        await fetch(`${supabaseUrl}/storage/v1/bucket`, {
-          method: "POST",
-          headers: {
-            apikey: supabaseKey,
-            Authorization: `Bearer ${supabaseKey}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ id: "uploads", public: true }),
-        });
-        // Upload via raw REST
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
         const uploadRes = await fetch(
           `${supabaseUrl}/storage/v1/object/uploads/${fileName}`,
           {
@@ -65,8 +56,10 @@ export async function POST(request: NextRequest) {
               "Content-Type": file.type,
             },
             body: file,
+            signal: controller.signal,
           }
         );
+        clearTimeout(timeoutId);
         if (uploadRes.ok) {
           return NextResponse.json({
             url: `${supabaseUrl}/storage/v1/object/public/uploads/${fileName}`,
@@ -85,8 +78,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ url: `/uploads/${fileName}` });
     } catch {}
 
-    // Last resort: base64 data URL — works everywhere (Vercel, local, etc.)
-    // The download button in Hero uses <a download> which handles data URLs fine
+    // Last resort: base64 data URL
     const base64 = Buffer.from(buffer).toString("base64");
     return NextResponse.json({ url: `data:${file.type};base64,${base64}` });
   } catch {
