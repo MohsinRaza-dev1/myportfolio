@@ -127,10 +127,13 @@ function ImageUploader({ current, onUpload, label }: {
 }) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+  const [preview, setPreview] = useState<string | null>(null);
 
   const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    // Show live preview immediately
+    setPreview(URL.createObjectURL(file));
     setUploading(true);
     const fd = new FormData();
     fd.append("file", file);
@@ -141,18 +144,23 @@ function ImageUploader({ current, onUpload, label }: {
         body: fd,
       });
       const data = await res.json();
-      if (data.url) onUpload(data.url);
+      if (data.url) {
+        onUpload(data.url);
+        setPreview(null);
+      }
     } catch { /* ignore */ }
     setUploading(false);
     if (fileRef.current) fileRef.current.value = "";
   };
 
+  const src = preview || current;
+
   return (
     <div>
       <label className="mb-1 block text-sm text-dark-400">{label}</label>
       <div className="flex items-center gap-3">
-        {current && (
-          <img src={current} alt="" className="h-14 w-14 rounded-lg border border-dark-700 object-cover" />
+        {src && (
+          <img src={src} alt="" className="h-14 w-14 rounded-lg border border-dark-700 object-cover" />
         )}
         <input ref={fileRef} type="file" accept="image/*" onChange={handleFile} className="hidden" />
         <button
@@ -173,12 +181,11 @@ function ImageUploader({ current, onUpload, label }: {
 function ProfileTab({ data, onChange }: { data: ProfileData; onChange: (d: ProfileData) => void }) {
   const set = (k: keyof ProfileData) => (v: string) => onChange({ ...data, [k]: v });
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 max-w-2xl">
       <ImageUploader current={data.profileImage} onUpload={set("profileImage")} label="Profile Image" />
       <div className="grid gap-4 sm:grid-cols-2">
         <Input label="Name" value={data.name} onChange={set("name")} />
         <Input label="Tagline" value={data.tagline} onChange={set("tagline")} />
-        <Input label="Title" value={data.title} onChange={set("title")} />
         <Input label="Short Title" value={data.shortTitle} onChange={set("shortTitle")} placeholder="e.g. Software Engineer & AI Developer" />
         <Input label="Education" value={data.education} onChange={set("education")} />
         <Input label="Email" value={data.email} onChange={set("email")} />
@@ -209,7 +216,7 @@ function NavTab({ items, onChange }: {
     onChange(next);
   };
   return (
-    <div className="space-y-3">
+    <div className="space-y-3 max-w-2xl">
       {items.map((item, i) => (
         <div key={i} className="flex gap-2 items-end">
           <Input label="Label" value={item.label} onChange={(v) => update(i, "label", v)} />
@@ -241,7 +248,7 @@ function SkillsTab({ skills, onChange }: {
   };
   const categories = ["Backend", "Frontend", "AI & Machine Learning", "Databases", "Tools"];
   return (
-    <div className="space-y-2">
+    <div className="space-y-2 max-w-2xl">
       {skills.map((s, i) => (
         <div key={i} className="flex gap-2 items-end">
           <Input label="Skill" value={s.name} onChange={(v) => update(i, "name", v)} />
@@ -802,7 +809,7 @@ export default function AdminDashboard() {
         </div>
       </header>
 
-      <div className="mx-auto max-w-7xl px-6 py-8">
+      <div className="mx-auto max-w-5xl px-6 py-8">
         <div className="flex gap-8">
           {/* Sidebar */}
           <aside className="hidden w-56 flex-shrink-0 md:block">
