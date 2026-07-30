@@ -39,19 +39,25 @@ export async function POST(request: NextRequest) {
       }
     } catch {}
 
-    // Try local filesystem (works in dev, fails on Vercel serverless)
+    // Try writable temp directory (/tmp on Vercel, public/uploads locally)
     try {
       const fs = await import("fs");
       const p = await import("path");
-      const uploadDir = p.join(process.cwd(), "public", "uploads");
-      if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
-      fs.writeFileSync(p.join(uploadDir, fileName), buffer);
-      return NextResponse.json({ url: `/uploads/${fileName}` });
+      // Try public/uploads first (works locally)
+      const publicDir = p.join(process.cwd(), "public", "uploads");
+      if (fs.existsSync(publicDir) || !process.env.VERCEL) {
+        if (!fs.existsSync(publicDir)) fs.mkdirSync(publicDir, { recursive: true });
+        fs.writeFileSync(p.join(publicDir, fileName), buffer);
+        return NextResponse.json({ url: `/uploads/${fileName}` });
+      }
+      // On Vercel: write to /tmp/uploads and serve via API
+      const tmpDir = "/tmp/uploads";
+      if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true });
+      fs.writeFileSync(p.join(tmpDir, fileName), buffer);
+      return NextResponse.json({ url: `/api/uploads/${fileName}` });
     } catch {}
 
-    // Ultimate fallback: inline base64 — works everywhere (Vercel, local, etc.)
-    const base64 = Buffer.from(buffer).toString("base64");
-    return NextResponse.json({ url: `data:${file.type};base64,${base64}` });
+    return NextResponse.json({ error: "Upload failed" }, { status: 500 });
   } catch {
     return NextResponse.json({ error: "Upload failed" }, { status: 500 });
   }
