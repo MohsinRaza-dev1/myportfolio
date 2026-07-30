@@ -181,9 +181,9 @@ function ImageUploader({ current, onUpload, label }: {
 function ProfileTab({ data, onChange }: { data: ProfileData; onChange: (d: ProfileData) => void }) {
   const set = (k: keyof ProfileData) => (v: string) => onChange({ ...data, [k]: v });
   return (
-    <div className="space-y-5 max-w-2xl">
+    <div className="space-y-5">
       <ImageUploader current={data.profileImage} onUpload={set("profileImage")} label="Profile Image" />
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-2 max-w-4xl">
         <Input label="Name" value={data.name} onChange={set("name")} />
         <Input label="Tagline" value={data.tagline} onChange={set("tagline")} />
         <Input label="Short Title" value={data.shortTitle} onChange={set("shortTitle")} placeholder="e.g. Software Engineer & AI Developer" />
@@ -216,7 +216,7 @@ function NavTab({ items, onChange }: {
     onChange(next);
   };
   return (
-    <div className="space-y-3 max-w-2xl">
+    <div className="space-y-3">
       {items.map((item, i) => (
         <div key={i} className="flex gap-2 items-end">
           <Input label="Label" value={item.label} onChange={(v) => update(i, "label", v)} />
@@ -248,7 +248,7 @@ function SkillsTab({ skills, onChange }: {
   };
   const categories = ["Backend", "Frontend", "AI & Machine Learning", "Databases", "Tools"];
   return (
-    <div className="space-y-2 max-w-2xl">
+    <div className="space-y-2">
       {skills.map((s, i) => (
         <div key={i} className="flex gap-2 items-end">
           <Input label="Skill" value={s.name} onChange={(v) => update(i, "name", v)} />
@@ -785,7 +785,7 @@ export default function AdminDashboard() {
     <div className="min-h-screen bg-dark-950">
       {/* Header */}
       <header className="sticky top-0 z-50 border-b border-dark-800 bg-dark-950/80 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
+        <div className="mx-auto flex w-full max-w-screen-2xl items-center justify-between px-6 py-3">
           <h1 className="text-lg font-bold text-white">Admin Panel</h1>
           <div className="flex items-center gap-3">
             {saveError && (
@@ -809,7 +809,7 @@ export default function AdminDashboard() {
         </div>
       </header>
 
-      <div className="mx-auto max-w-5xl px-6 py-8">
+      <div className="mx-auto w-full max-w-screen-2xl px-6 py-8">
         <div className="flex gap-8">
           {/* Sidebar */}
           <aside className="hidden w-56 flex-shrink-0 md:block">
