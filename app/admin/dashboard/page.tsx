@@ -785,7 +785,7 @@ export default function AdminDashboard() {
     <div className="min-h-screen bg-dark-950">
       {/* Header */}
       <header className="sticky top-0 z-50 border-b border-dark-800 bg-dark-950/80 backdrop-blur-xl">
-        <div className="mx-auto flex w-full max-w-screen-2xl items-center justify-between px-6 py-3">
+        <div className="mx-auto flex w-full items-center justify-between px-6 py-3">
           <h1 className="text-lg font-bold text-white">Admin Panel</h1>
           <div className="flex items-center gap-3">
             {saveError && (
@@ -809,7 +809,7 @@ export default function AdminDashboard() {
         </div>
       </header>
 
-      <div className="mx-auto w-full max-w-screen-2xl px-6 py-8">
+      <div className="mx-auto w-full px-4 sm:px-6 py-8">
         <div className="flex gap-8">
           {/* Sidebar */}
           <aside className="hidden w-56 flex-shrink-0 md:block">
@@ -832,7 +832,7 @@ export default function AdminDashboard() {
           </aside>
 
           {/* Content */}
-          <main className="flex-1">
+          <main className="flex-1 min-w-0">
             {/* Mobile tabs */}
             <div className="mb-6 flex gap-2 overflow-x-auto pb-2 md:hidden">
               {TABS.map((tab) => (
@@ -850,7 +850,7 @@ export default function AdminDashboard() {
               ))}
             </div>
 
-            <div className="rounded-2xl border border-dark-800 bg-dark-900/60 p-6 backdrop-blur-xl">
+            <div className="rounded-2xl border border-dark-800 bg-dark-900/60 p-4 sm:p-6 backdrop-blur-xl">
               {activeTab === "profile" && (
                 <ProfileTab data={content.profile} onChange={(d) => setContent({ ...content, profile: d })} />
               )}
