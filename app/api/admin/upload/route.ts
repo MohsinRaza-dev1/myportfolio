@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
       }
     } catch {}
 
-    // Fallback: local filesystem
+    // Try local filesystem (works in dev, fails on Vercel serverless)
     try {
       const fs = await import("fs");
       const p = await import("path");
@@ -47,9 +47,11 @@ export async function POST(request: NextRequest) {
       if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
       fs.writeFileSync(p.join(uploadDir, fileName), buffer);
       return NextResponse.json({ url: `/uploads/${fileName}` });
-    } catch {
-      return NextResponse.json({ error: "Upload failed" }, { status: 500 });
-    }
+    } catch {}
+
+    // Ultimate fallback: inline base64 — works everywhere (Vercel, local, etc.)
+    const base64 = Buffer.from(buffer).toString("base64");
+    return NextResponse.json({ url: `data:${file.type};base64,${base64}` });
   } catch {
     return NextResponse.json({ error: "Upload failed" }, { status: 500 });
   }
