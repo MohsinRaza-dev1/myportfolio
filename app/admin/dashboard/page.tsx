@@ -211,7 +211,9 @@ function FileUploader({ current, onUpload, label, accept }: {
     if (fileRef.current) fileRef.current.value = "";
   };
 
-  const fileName = current ? current.split("/").pop() : null;
+  const fileName = current
+    ? current.startsWith("data:") ? "Base64 PDF" : current.split("/").pop()
+    : null;
 
   return (
     <div>
