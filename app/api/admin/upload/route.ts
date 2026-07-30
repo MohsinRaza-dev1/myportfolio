@@ -39,25 +39,53 @@ export async function POST(request: NextRequest) {
       }
     } catch {}
 
-    // Try writable temp directory (/tmp on Vercel, public/uploads locally)
+    // Create the uploads bucket if it doesn't exist, then retry
+    try {
+      const supabaseUrl = process.env.SUPABASE_URL;
+      const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+      if (supabaseUrl && supabaseKey) {
+        // Try creating bucket first
+        await fetch(`${supabaseUrl}/storage/v1/bucket`, {
+          method: "POST",
+          headers: {
+            apikey: supabaseKey,
+            Authorization: `Bearer ${supabaseKey}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ id: "uploads", public: true }),
+        });
+        // Upload via raw REST
+        const uploadRes = await fetch(
+          `${supabaseUrl}/storage/v1/object/uploads/${fileName}`,
+          {
+            method: "POST",
+            headers: {
+              apikey: supabaseKey,
+              Authorization: `Bearer ${supabaseKey}`,
+              "Content-Type": file.type,
+            },
+            body: file,
+          }
+        );
+        if (uploadRes.ok) {
+          return NextResponse.json({
+            url: `${supabaseUrl}/storage/v1/object/public/uploads/${fileName}`,
+          });
+        }
+      }
+    } catch {}
+
+    // Fallback: write to public/uploads (works locally, also committed to git)
     try {
       const fs = await import("fs");
       const p = await import("path");
-      // Try public/uploads first (works locally)
-      const publicDir = p.join(process.cwd(), "public", "uploads");
-      if (fs.existsSync(publicDir) || !process.env.VERCEL) {
-        if (!fs.existsSync(publicDir)) fs.mkdirSync(publicDir, { recursive: true });
-        fs.writeFileSync(p.join(publicDir, fileName), buffer);
-        return NextResponse.json({ url: `/uploads/${fileName}` });
-      }
-      // On Vercel: write to /tmp/uploads and serve via API
-      const tmpDir = "/tmp/uploads";
-      if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true });
-      fs.writeFileSync(p.join(tmpDir, fileName), buffer);
-      return NextResponse.json({ url: `/api/uploads/${fileName}` });
+      const uploadDir = p.join(process.cwd(), "public", "uploads");
+      if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+      fs.writeFileSync(p.join(uploadDir, fileName), buffer);
+      return NextResponse.json({ url: `/uploads/${fileName}` });
     } catch {}
 
-    return NextResponse.json({ error: "Upload failed" }, { status: 500 });
+    return NextResponse.json({ error: "Upload failed. Create 'uploads' bucket in Supabase Storage dashboard." }, { status: 500 });
   } catch {
     return NextResponse.json({ error: "Upload failed" }, { status: 500 });
   }
