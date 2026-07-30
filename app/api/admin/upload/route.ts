@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
       }
     } catch {}
 
-    // Fallback: write to public/uploads (works locally, also committed to git)
+    // Fallback: write to public/uploads (works locally)
     try {
       const fs = await import("fs");
       const p = await import("path");
@@ -85,7 +85,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ url: `/uploads/${fileName}` });
     } catch {}
 
-    return NextResponse.json({ error: "Upload failed. Create 'uploads' bucket in Supabase Storage dashboard." }, { status: 500 });
+    // Last resort: base64 data URL — works everywhere (Vercel, local, etc.)
+    // The download button in Hero uses <a download> which handles data URLs fine
+    const base64 = Buffer.from(buffer).toString("base64");
+    return NextResponse.json({ url: `data:${file.type};base64,${base64}` });
   } catch {
     return NextResponse.json({ error: "Upload failed" }, { status: 500 });
   }
