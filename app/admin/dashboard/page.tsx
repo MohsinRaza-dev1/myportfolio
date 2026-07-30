@@ -132,7 +132,6 @@ function ImageUploader({ current, onUpload, label }: {
   const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    // Show live preview immediately
     setPreview(URL.createObjectURL(file));
     setUploading(true);
     const fd = new FormData();
@@ -176,6 +175,61 @@ function ImageUploader({ current, onUpload, label }: {
   );
 }
 
+// ─── File Uploader (for PDF) ──────────────────────────────────────────
+
+function FileUploader({ current, onUpload, label, accept }: {
+  current: string; onUpload: (url: string) => void; label: string; accept?: string;
+}) {
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+
+  const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    const fd = new FormData();
+    fd.append("file", file);
+    try {
+      const res = await fetch("/api/admin/upload", {
+        method: "POST",
+        headers: uploadAuthHeaders(),
+        body: fd,
+      });
+      const data = await res.json();
+      if (data.url) {
+        onUpload(data.url);
+      }
+    } catch { /* ignore */ }
+    setUploading(false);
+    if (fileRef.current) fileRef.current.value = "";
+  };
+
+  const fileName = current ? current.split("/").pop() : null;
+
+  return (
+    <div>
+      <label className="mb-1 block text-sm text-dark-400">{label}</label>
+      <div className="flex items-center gap-3">
+        <input ref={fileRef} type="file" accept={accept || ".pdf"} onChange={handleFile} className="hidden" />
+        <button
+          onClick={() => fileRef.current?.click()}
+          disabled={uploading}
+          className="flex items-center gap-1.5 rounded-lg border border-dark-700 px-3 py-2 text-sm text-dark-400 hover:border-primary-500/50 hover:text-primary-400 disabled:opacity-60"
+        >
+          <Upload size={16} /> {uploading ? "Uploading..." : "Upload PDF"}
+        </button>
+        {fileName ? (
+          <a href={current} target="_blank" rel="noopener noreferrer" className="text-xs text-primary-400 hover:text-primary-300 truncate max-w-[200px] underline">
+            {fileName}
+          </a>
+        ) : (
+          <span className="text-xs text-dark-500">No file</span>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ─── Tab: Profile ────────────────────────────────────────────────────────
 
 function ProfileTab({ data, onChange }: { data: ProfileData; onChange: (d: ProfileData) => void }) {
@@ -193,7 +247,9 @@ function ProfileTab({ data, onChange }: { data: ProfileData; onChange: (d: Profi
         <Input label="WhatsApp Number" value={data.whatsapp} onChange={set("whatsapp")} placeholder="e.g. +923037327992" />
         <Input label="GitHub URL" value={data.github} onChange={set("github")} />
         <Input label="LinkedIn URL" value={data.linkedin} onChange={set("linkedin")} />
-        <Input label="Resume File Path" value={data.resumePath} onChange={set("resumePath")} />
+        <div className="sm:col-span-2">
+          <FileUploader current={data.resumePath} onUpload={set("resumePath")} label="Resume (PDF)" accept=".pdf" />
+        </div>
         <Input label="Location" value={data.location} onChange={set("location")} />
       </div>
       <Textarea label="Description" value={data.description} onChange={set("description")} rows={3} />
