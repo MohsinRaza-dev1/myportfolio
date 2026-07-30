@@ -182,10 +182,12 @@ function FileUploader({ current, onUpload, label, accept }: {
 }) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    setError("");
     setUploading(true);
     const fd = new FormData();
     fd.append("file", file);
@@ -198,8 +200,13 @@ function FileUploader({ current, onUpload, label, accept }: {
       const data = await res.json();
       if (data.url) {
         onUpload(data.url);
+        setError("");
+      } else {
+        setError(data.error || "Upload failed");
       }
-    } catch { /* ignore */ }
+    } catch {
+      setError("Upload error — check console");
+    }
     setUploading(false);
     if (fileRef.current) fileRef.current.value = "";
   };
@@ -225,6 +232,7 @@ function FileUploader({ current, onUpload, label, accept }: {
         ) : (
           <span className="text-xs text-dark-500">No file</span>
         )}
+        {error && <span className="text-xs text-red-400">{error}</span>}
       </div>
     </div>
   );
